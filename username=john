@@ -1,0 +1,7 @@
+HTTP/1.1 Sucessfully logged in. Redirecting... unknown
+Set-Cookie: SID=cxzZNMAYQmU; path=/; expires=Mon, 31-Jan-2011 08:26:22 GMT
+Location: /
+Content-Type: text/plain
+Content-Length: 37
+Connection: keep-alive
+

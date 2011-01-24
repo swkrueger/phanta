@@ -1,5 +1,8 @@
-/* Farmer module */
+var sys=require('sys');
 
+sys.debug("farmer module to your service!");
+
+/* Farmer module */
 farmer = exports;
 
 farmer.fields = {};
@@ -28,4 +31,5 @@ farmer.GET = function(req, res) {
     // right type?
 
 }
+farmer.GET.authReq = false;
 

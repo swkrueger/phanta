@@ -25,6 +25,9 @@ MODULES_PATH="./modules/";
 DIRECTORY_INDEX="index.html";
 modules = {};
 
+
+// TODO: Write separate class for mkError, notfound, unauth, etc.
+
 ////
 // Load modules:
 //  Maps all modules in /modules/ in an array
@@ -33,7 +36,7 @@ modules = {};
 load_modules = function(callback) {
     fs.readdir(MODULES_PATH, function (err, files) {
         var count = files.length,
-            actions = files.map(function(filename) {
+             actions = files.map(function(filename) {
                 modname = path.basename(filename, '.js');
                 sys.debug("Mapping module "+modname);
                 modules[modname] = require(MODULES_PATH+filename);
@@ -58,18 +61,38 @@ mkError = function(code, description) {
 };
 
 ////
+// POST handler
+////
+POST_handler = function(req, callback)
+{
+    req.POSTcontent = {};
+    var _CONTENT = '';
+
+    if (req.method == 'POST') {
+        req.addListener('data', function(chunk) {
+            _CONTENT+=chunk;
+        });
+        req.addListener('end', function() {
+            req.POSTcontent = qs.parse(_CONTENT);
+            callback();
+        });
+    };
+};
+
+
+////
 // Not found
 ////
 not_found = function(req, res) {
-	var not_found_msg = 'Not Found';
-
-	res.writeHead(404, {
-		'Content-Type': 'text/plain',
-		'Content-Length': not_found_msg.length
-	});
-	res.write(not_found_msg);
-	res.end();
+    res.writeText(404, 'Not Found');
 };
+
+////
+// Moved Permanently
+////
+/*moved_permanently = function(req, res) {
+    res.writeText(404, 'Not Found');
+};*/
 
 ////
 // Load file
@@ -98,12 +121,7 @@ load_file = function(filename) {
                 return not_found(req, res);
             }
             loadResponseData(function() {
-                res.writeHead(200, {
-                    'Content-Type': 'text/html',
-                    'Content-Length': body.length
-                });
-                res.write(body);
-                res.end();
+                res.writeHTML(200, body);
             });
         });
     };
@@ -128,7 +146,7 @@ dispatch_module = function(req) {
     }
     req.path.shift();
     return eval(func);
-}
+};
 
 ////
 // Start server
@@ -136,22 +154,40 @@ dispatch_module = function(req) {
 startServer = function() {
     //var rclient = redisclient.createClient();
     http.createServer(function (req, res) {
+        res._headers = {};
         req.uri = url.parse(req.url).pathname;
         req.path = req.uri.split("/");
         req.path.shift();
 	    req.params = qs.parse(url.parse(req.url).query);
         var handler = dispatch_module(req) || load_file('./files'+req.uri) || not_found;
+        console.log(dispatch_module(req).required);
 
         res.simpleJSON = function(code, obj) {
             var body = JSON.stringify(obj);
-            res.writeHead(code, {
-                'Content-Type': 'text/json',
-                'Content-Length': body.length
-            });
+            res._headers['Content-Type'] = 'text/json';
+            res._headers['Content-Length'] = body.length;
+            res.writeHead(code, res._headers);
             res.write(body);
             res.end();
         };
-	    handler(req, res);
+        res.writeText = function(code, body) {
+            res._headers['Content-Type'] = 'text/plain';
+            res._headers['Content-Length'] = body.length;
+            res.writeHead(body, res._headers);
+            res.write(body);
+            res.end();
+        };
+        res.writeHTML = function(code, body) {
+            res._headers['Content-Type'] = 'text/html';
+            res._headers['Content-Length'] = body.length;
+            res.writeHead(code, res._headers);
+            res.write(body);
+            res.end();
+        };
+        if (modules['auth']===undefined) handler(req, res);
+        else {
+            modules['auth'].checkSession(req, res, handler);
+        }
     }).listen(PORT, HOST);
     console.log("Server at http://" + HOST + ':' + PORT.toString() + '/');
 }

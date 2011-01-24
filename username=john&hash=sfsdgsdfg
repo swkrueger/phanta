@@ -1,0 +1,6 @@
+HTTP/1.1 401 Unauthorized
+Set-Cookie: SID=NHyPtudaNLt; path=/; expires=Mon, 31-Jan-2011 08:32:20 GMT
+Content-Type: text/json
+Content-Length: 24
+Connection: keep-alive
+
