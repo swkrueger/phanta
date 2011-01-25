@@ -147,7 +147,7 @@ load_file = function(filename) {
 dispatch_module = function(req) {
     var modname = req.path[0];
     var funcname = req.path[1];
-    if (funcname=="" || funcname===undefined) funcname = "index";  // TODO: Test
+    if (funcname=="" || funcname===undefined) funcname = "index";
     if (modules[modname]===undefined) {
         sys.debug("Module '"+modname+ "' does not exist");
         return false;
@@ -204,10 +204,15 @@ startServer = function() {
             res.write(body);
             res.end();
         };
-        if (modules['auth']===undefined) handler(req, res);
-        else {
-            modules['auth'].checkSession(req, res, handler);
+        res.loadFile = function(filename) {
+            load_file(filename)(req, res);
         }
+        POST_handler(req, function() {
+            if (modules['auth']===undefined) handler(req, res);
+            else {
+                modules['auth'].checkSession(req, res, handler);
+            }
+        });
     }).listen(PORT, HOST);
     console.log("Server at http://" + HOST + ':' + PORT.toString() + '/');
 }
