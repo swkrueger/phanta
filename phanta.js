@@ -24,6 +24,8 @@ var sys=require('sys'),
     opts = require('opts'),
     util=require('./util');
 
+//// NPM requirements: redis, opts, sesh
+
 ////
 // Globals
 ////
@@ -159,6 +161,8 @@ dispatch_module = function(req) {
         return false;
     }
     var func = 'modules[modname].'+funcname;
+    // TODO: Check whether type exists - the following fail, because of you type
+    // in /auth/test.jpg, it will fail
     if (eval(func)===undefined) {
         sys.debug(func+" does not exist");
         return mkError(404, "Module '"+modname+ "' function '"+funcname+"' does not exist");

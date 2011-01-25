@@ -40,8 +40,6 @@ auth.login.POST = function(req, res) {
             if (err) return mkError(500, "Database error")(req, res);
             // Is the hash correct?
             if (hashreq==hashdb) {  // Yes
-                console.log(hashreq);
-                console.log(hashdb);
                 console.log("User '"+user+"' has sucessfully logged in");
                 req.session.data.user = user;
                 res._headers['Location'] = '/';
@@ -72,7 +70,6 @@ auth.register.POST = function(req, res) {
         }
         rclient.incr("globals:uid", function(err, uid) {
             if (err || uid===null) return mkError(500, "Database error")(req, res);
-            sys.debug(" - UID of user: "+uid);
             Step(
                 function storeValues() {
                     // Store values in database
