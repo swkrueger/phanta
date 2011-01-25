@@ -10,17 +10,24 @@
 //                                      //
 //////////////////////////////////////////
 
+// TODO: Argument to specify port and host
+// TODO: Cleanup code + debug output
+// TODO: Test code
+// TODO: Validations, check POST data (eg. whether username is set)
+
 var sys=require('sys'),
     http=require('http'),
     url=require('url'),
     qs=require('querystring'),
     fs=require('fs'),
     path=require('path'),
+    opts = require('opts'),
     util=require('./util');
 
 ////
 // Globals
 ////
+VERSION="0.01 alpha";
 // HOST: HTTP server host
 //HOST="127.0.0.1";
 HOST="";
@@ -215,6 +222,28 @@ startServer = function() {
     }).listen(PORT, HOST);
     console.log("Server at http://" + HOST + ':' + PORT.toString() + '/');
 }
+
+var options = [
+  { short       : 'v'
+  , long        : 'version'
+  , description : 'Show version and exit'
+  , callback    : function () { console.log('v'+VERSION); process.exit(1); }
+  },
+  { short       : 'h'
+  , long        : 'host'
+  , description : 'The hostname phanta server must bind to'
+  , value       : true
+  , callback    : function (host) { HOST = host; } // override host value
+  },
+  { short       : 'p'
+  , long        : 'port'
+  , description : 'The port phanta server must bind to'
+  , value       : true
+  , callback    : function (port) { PORT = port; }
+  },
+];
+
+opts.parse(options, true);
 
 load_modules( startServer );
 

@@ -58,7 +58,9 @@ auth.login.POST = function(req, res) {
 auth.register = {};
 auth.register.POST = function(req, res) {
     // Extract POST data
-    user = req.POSTcontent.username;
+    if (req.POSTcontent.email) user = req.POSTcontent.email;
+    else user = req.POSTcontent.cellphone;
+    req.POSTcontent.username = user;
     // TODO: Check for integrity
     sys.debug("Registering new user '"+user+"'.");
     rclient.exists("username:"+user+":uid", function(err, exists) {
