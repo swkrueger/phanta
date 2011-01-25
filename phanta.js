@@ -153,11 +153,11 @@ dispatch_module = function(req) {
         return false;
     }
     var func = 'modules[modname].'+funcname;
-    if (typeof eval(func) != 'function' || eval(func)!==undefined) {
+    if (eval(func)===undefined) {
         sys.debug(func+" does not exist");
         return mkError(404, "Module '"+modname+ "' function '"+funcname+"' does not exist");
     }
-    func = func+'.'+funcname;
+    func = func+'.'+req.method;
     if (typeof eval(func) != 'function') {
         sys.debug(func+" does not exist");
         return mkError(501, "Module '"+modname+ "' function '"+funcname+"' method '"+req.method+"' not implemented");
