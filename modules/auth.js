@@ -4,13 +4,36 @@ var sys=require('sys'),
     util=require('../util'),
     Step = require('../lib/step.js');
 
-sys.debug("auth module to your service!");
+sys.debug("  auth module to your service!");
 
 auth = exports;
 
 var sessions = {};
 
-auth.login = function(req, res) {
+/*auth.GET = function(req, res) {
+    dispatch_function(req, res, this);
+}
+
+auth.POST = function(req, res) {
+    POST_handler(req, function() {
+        var cmd = req.path.shift();
+        if (cmd=="login") auth.login(req, res);
+        else if (cmd=="register") auth.register(req, res);
+    });
+}*/
+
+auth.session = { };
+auth.session.GET = function(req, res) {
+    return res.simpleJSON(200, {
+        user: req.session.data.user,
+        authorized: req.session.data.user!="Guest"
+        }
+    );
+}
+
+auth.login = { };
+auth.login.POST = function(req, res) {
+    // TODO: Show "already logged in"
     // Extract POST data
     user = req.POSTcontent.username;
     hashreq = req.POSTcontent.hash;
@@ -29,38 +52,40 @@ auth.login = function(req, res) {
             if (err) return mkError(500, "Database error")(req, res);
             // Is the hash correct?
             if (hashreq==hashdb) {  // Yes
+                console.log(hashreq);
+                console.log(hashdb);
                 console.log("User '"+user+"' has sucessfully logged in");
                 req.session.data.user = user;
                 res._headers['Location'] = '/';
-                res.writeText(302, 'Sucessfully logged in. Redirecting...');
+                //res.writeText(302, 'Sucessfully logged in. Redirecting...');
+                res.writeHTML(302, '<h1>Redirecting...</h1>');
             } else {  // No
-                console.log("User '"+user+"' has sucessfully logged in");
+                console.log("Login failed for user '"+user+"': Incorrect password");
                 return auth.unauthorized(req, res);
             }
         });
     });
 }
 
-auth.register = function(req, res) {
+auth.register = {};
+auth.register.POST = function(req, res) {
     // Extract POST data
     user = req.POSTcontent.username;
     // TODO: Check for integrity
-    // TODO: Check whether the user already exists
     sys.debug("Registering new user '"+user+"'.");
     rclient.exists("username:"+user+":uid", function(err, exists) {
         if (err) return mkError(500, "Database error")(req, res);
-        // Username already exists
+        // Username already exists?
         if (exists) {
-            console.log(" - Username already exists");
+            console.log("Registration of user '"+user+"' failed: Username already exist");
             return res.simpleJSON(409, { failed: "Username already exists" });
         }
         rclient.incr("globals:uid", function(err, uid) {
             if (err || uid===null) return mkError(500, "Database error")(req, res);
             sys.debug(" - UID of user: "+uid);
-            // Store values
-            // TODO: Error handlers
             Step(
                 function storeValues() {
+                    // Store values in database
                     rclient.setnx("username:"+user+":uid", uid, this.parallel());
                     rclient.setnx("uid:"+uid+":username", user, this.parallel());
                     rclient.setnx("uid:"+uid+":hash", req.POSTcontent.hash, this.parallel());
@@ -70,6 +95,7 @@ auth.register = function(req, res) {
                 function showPage(err) {
                     if (err) return mkError(500, "Database error")(req, res);
                     res.simpleJSON(201, { ok: "User created" });
+                    console.log("Registered user '"+user+"' with UID "+uid);
                 }
                 );
         });
@@ -77,21 +103,14 @@ auth.register = function(req, res) {
 
 }
 
-auth.logoff = function(req, res) {
+auth.logoff = { };
+auth.logoff.GET = function(req, res) {
     req.session.data.user = "Guest";
+	res.simpleJSON(200, {
+        ok: "logged off"
+	});
 }
 
-auth.GET = function(req, res) {
-    if (cmd=="logoff") auth.logoff(req, res);
-}
-
-auth.POST = function(req, res) {
-    POST_handler(req, function() {
-        var cmd = req.path.shift();
-        if (cmd=="login") auth.login(req, res);
-        else if (cmd=="register") auth.register(req, res);
-    });
-}
 
 auth.unauthorized = function(req, res) {
 	res.simpleJSON(401, {

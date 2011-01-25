@@ -44,7 +44,7 @@ input.btn {
   border-color: #696 #363 #363 #696; 
 	  filter:progid:DXImageTransform.Microsoft.Gradient 
 	  (GradientType=0,StartColorStr='#ffffffff',EndColorStr='#ffeeddaa'); 
-
+}
 </style>
 <script type="text/javascript"><!-- 
 	function hov(loc,cls) { 
@@ -56,11 +56,10 @@ input.btn {
 <fieldset>
 <legend>Log in</legend>
 <h1><i>Phanta.org</i></h1>
-<form action="/auth/login" method="post">
-<p><label for="name">Username:</label><input type="text" id="Username"/></p>
-<p><label for="name">Password:</label><input type="password" name ="password"/><br/></p>
-<input type="checkbox" name="vehicle" value="login" />Keep me logged in.
-
+<form action="/auth/login" method="POST">
+<p><label for="username">Username:</label><input type="text" name="username"/></p>
+<p><label for="password">Password:</label><input type="password" name="hash"/><br/></p>
+<input type="checkbox" name="remember" value="login" />Remember me
 <p  class="submit"><input type="submit" value="Sign-Up"
 class="submit"><input type="submit" value="Submit"/></p>
 </fieldset>
