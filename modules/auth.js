@@ -1,5 +1,5 @@
 var sys=require('sys'),
-    rclient=require('redis-client').createClient(),
+    rclient=require('redis').createClient(),
     session=require('../lib/session/core.js').session,
     util=require('../util'),
     Step = require('../lib/step.js');
@@ -9,18 +9,6 @@ sys.debug("  auth module to your service!");
 auth = exports;
 
 var sessions = {};
-
-/*auth.GET = function(req, res) {
-    dispatch_function(req, res, this);
-}
-
-auth.POST = function(req, res) {
-    POST_handler(req, function() {
-        var cmd = req.path.shift();
-        if (cmd=="login") auth.login(req, res);
-        else if (cmd=="register") auth.register(req, res);
-    });
-}*/
 
 auth.session = { };
 auth.session.GET = function(req, res) {
@@ -118,6 +106,10 @@ auth.unauthorized = function(req, res) {
 	});
 }
 
+auth.index = { };
+auth.index.GET = function(req, res) {
+    res.loadFile("./files/login.html");
+}
 
 // EXPIRE session - let redis expire the cookie after x seconds - err - then it
 // has to be refreshed
@@ -130,4 +122,5 @@ auth.checkSession = function(req, res, handler) {
         handler(req, res);
     });
 }
+
 

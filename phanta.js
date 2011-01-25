@@ -88,10 +88,9 @@ not_found = function(req, res) {
 ////
 POST_handler = function(req, callback)
 {
-    req.POSTcontent = {};
-    var _CONTENT = '';
-
     if (req.method == 'POST') {
+        req.POSTcontent = {};
+        var _CONTENT = '';
         // Load chucks of POST data
         req.addListener('data', function(chunk) {
             _CONTENT+=chunk;
@@ -101,7 +100,7 @@ POST_handler = function(req, callback)
             req.POSTcontent = qs.parse(_CONTENT);
             callback();
         });
-    };
+    } else callback();
 };
 
 ////
@@ -147,17 +146,17 @@ load_file = function(filename) {
 dispatch_module = function(req) {
     var modname = req.path[0];
     var funcname = req.path[1];
-    if (funcname=="" || funcname===undefined) funcname = "index";  // TODO: Test
+    if (funcname=="" || funcname===undefined) funcname = "index";
     if (modules[modname]===undefined) {
         sys.debug("Module '"+modname+ "' does not exist");
         return false;
     }
     var func = 'modules[modname].'+funcname;
-    if (typeof eval(func) != 'function' || eval(func)!==undefined) {
+    if (eval(func)===undefined) {
         sys.debug(func+" does not exist");
         return mkError(404, "Module '"+modname+ "' function '"+funcname+"' does not exist");
     }
-    func = func+'.'+funcname;
+    func = func+'.'+req.method;
     if (typeof eval(func) != 'function') {
         sys.debug(func+" does not exist");
         return mkError(501, "Module '"+modname+ "' function '"+funcname+"' method '"+req.method+"' not implemented");
@@ -204,10 +203,15 @@ startServer = function() {
             res.write(body);
             res.end();
         };
-        if (modules['auth']===undefined) handler(req, res);
-        else {
-            modules['auth'].checkSession(req, res, handler);
+        res.loadFile = function(filename) {
+            load_file(filename)(req, res);
         }
+        POST_handler(req, function() {
+            if (modules['auth']===undefined) handler(req, res);
+            else {
+                modules['auth'].checkSession(req, res, handler);
+            }
+        });
     }).listen(PORT, HOST);
     console.log("Server at http://" + HOST + ':' + PORT.toString() + '/');
 }
