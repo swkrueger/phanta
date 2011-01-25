@@ -88,10 +88,9 @@ not_found = function(req, res) {
 ////
 POST_handler = function(req, callback)
 {
-    req.POSTcontent = {};
-    var _CONTENT = '';
-
     if (req.method == 'POST') {
+        req.POSTcontent = {};
+        var _CONTENT = '';
         // Load chucks of POST data
         req.addListener('data', function(chunk) {
             _CONTENT+=chunk;
@@ -101,7 +100,7 @@ POST_handler = function(req, callback)
             req.POSTcontent = qs.parse(_CONTENT);
             callback();
         });
-    };
+    } else callback();
 };
 
 ////
