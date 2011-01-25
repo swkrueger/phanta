@@ -1,6 +1,6 @@
 var sys=require('sys');
 
-sys.debug("farmer module to your service!");
+sys.debug("  farmer module to your service!");
 
 /* Farmer module */
 farmer = exports;

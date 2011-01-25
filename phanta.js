@@ -18,15 +18,22 @@ var sys=require('sys'),
     path=require('path'),
     util=require('./util');
 
+////
 // Globals
-HOST="127.0.0.1";
-PORT=8124;
+////
+// HOST: HTTP server host
+//HOST="127.0.0.1";
+HOST="";
+// PORT: HTTP server port
+//PORT=8124;
+PORT=80;
+// MODULES_PATH: Directory containing all modules
 MODULES_PATH="./modules/";
+// DIRECTORY_INDEX: Filename to append to a file request ending with "/"
 DIRECTORY_INDEX="index.html";
+
 modules = {};
 
-
-// TODO: Write separate class for mkError, notfound, unauth, etc.
 
 ////
 // Load modules:
@@ -34,14 +41,21 @@ modules = {};
 //  Assume all the files in /modules/ are .js  FIXME
 ////
 load_modules = function(callback) {
+    console.log("Loading modules...");
+    // Get the filenames of all files in /modules/
     fs.readdir(MODULES_PATH, function (err, files) {
         var count = files.length,
-             actions = files.map(function(filename) {
-                modname = path.basename(filename, '.js');
-                sys.debug("Mapping module "+modname);
-                modules[modname] = require(MODULES_PATH+filename);
-                return function(callback) { callback(); };
+        // Map the filenames to funtions loading the modules
+        actions = files.map(function(filename) {
+            // Make sure the file is a .js file
+            if (path.extname(filename)!='.js') return function(callback) { callback(); };
+            modname = path.basename(filename, '.js');
+            sys.debug("Mapping module "+modname);
+            // Load the module
+            modules[modname] = require(MODULES_PATH+filename);
+            return function(callback) { callback(); };
             });
+        // Run the funtions
         fork(actions, function(results) {
             console.log("Loaded "+files.length+" modules");
             callback();
@@ -51,6 +65,7 @@ load_modules = function(callback) {
 
 ////
 // Error handler
+//  Returns a function that will output some JSON with the error description
 ////
 mkError = function(code, description) {
     return function(req, res) {
@@ -61,26 +76,6 @@ mkError = function(code, description) {
 };
 
 ////
-// POST handler
-////
-POST_handler = function(req, callback)
-{
-    req.POSTcontent = {};
-    var _CONTENT = '';
-
-    if (req.method == 'POST') {
-        req.addListener('data', function(chunk) {
-            _CONTENT+=chunk;
-        });
-        req.addListener('end', function() {
-            req.POSTcontent = qs.parse(_CONTENT);
-            callback();
-        });
-    };
-};
-
-
-////
 // Not found
 ////
 not_found = function(req, res) {
@@ -88,14 +83,31 @@ not_found = function(req, res) {
 };
 
 ////
-// Moved Permanently
+// POST handler
+//  Loads the POST data into the request object
 ////
-/*moved_permanently = function(req, res) {
-    res.writeText(404, 'Not Found');
-};*/
+POST_handler = function(req, callback)
+{
+    req.POSTcontent = {};
+    var _CONTENT = '';
+
+    if (req.method == 'POST') {
+        // Load chucks of POST data
+        req.addListener('data', function(chunk) {
+            _CONTENT+=chunk;
+        });
+        // Parse data and load into request object
+        req.addListener('end', function() {
+            req.POSTcontent = qs.parse(_CONTENT);
+            callback();
+        });
+    };
+};
 
 ////
 // Load file
+//  Static file handler
+//  TODO: Cache files
 ////
 load_file = function(filename) {
 	var body;
@@ -134,16 +146,24 @@ load_file = function(filename) {
 ////
 dispatch_module = function(req) {
     var modname = req.path[0];
+    var funcname = req.path[1];
+    if (funcname=="" || funcname===undefined) funcname = "index";  // TODO: Test
     if (modules[modname]===undefined) {
         sys.debug("Module '"+modname+ "' does not exist");
         return false;
     }
-    sys.debug("Dispatch to module "+modname);
-    var func = 'modules[modname].'+req.method;
+    var func = 'modules[modname].'+funcname;
+    if (typeof eval(func) != 'function' || eval(func)!==undefined) {
+        sys.debug(func+" does not exist");
+        return mkError(404, "Module '"+modname+ "' function '"+funcname+"' does not exist");
+    }
+    func = func+'.'+funcname;
     if (typeof eval(func) != 'function') {
         sys.debug(func+" does not exist");
-        return mkError(501, "Module '"+modname+ "' method '"+req.method+"' not implemented");
+        return mkError(501, "Module '"+modname+ "' function '"+funcname+"' method '"+req.method+"' not implemented");
     }
+    sys.debug("Dispatch to module '"+modname+"' function '"+funcname+"' method '"+req.method+"'");
+    req.path.shift();
     req.path.shift();
     return eval(func);
 };
@@ -154,13 +174,13 @@ dispatch_module = function(req) {
 startServer = function() {
     //var rclient = redisclient.createClient();
     http.createServer(function (req, res) {
+        console.log("Received HTTP request for the URL "+req.url);
         res._headers = {};
         req.uri = url.parse(req.url).pathname;
         req.path = req.uri.split("/");
         req.path.shift();
 	    req.params = qs.parse(url.parse(req.url).query);
         var handler = dispatch_module(req) || load_file('./files'+req.uri) || not_found;
-        console.log(dispatch_module(req).required);
 
         res.simpleJSON = function(code, obj) {
             var body = JSON.stringify(obj);
@@ -193,14 +213,4 @@ startServer = function() {
 }
 
 load_modules( startServer );
-
-
-//sys.debug();
-
-
-// Load web server
-
-/// Check module
-/// Do not exist? Check file (security: check in /files/ -> /)
-/// Do not exist? 404
 
