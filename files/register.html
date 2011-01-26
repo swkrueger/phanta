@@ -7,7 +7,7 @@
 <script type="text/javascript">
  $(document).ready(function(){
     $("form[name=register]").submit(function(event){       
-	if (event.target.password1.value!=event.target.password2.value) {
+	if ($(event.target.password1.value!=event.target.password2.value)) {
 		$("span").text("Passwords do not Macth").show().fadeOut(1000);
 		return false;
 	}
@@ -31,7 +31,6 @@
 <h4>OR</h4>
 <p><label for="cellphone">Cellphone:</label><input type="text" name="cellphone" placeholder="eg +27 709 0000 000"/><br/></p>
 <p> <h6>Please Use International format only : eg  +27 76... </h6></p>
-<p><span></span></p>
 <p><label for="password1">Password:</label><input type="password" name="password1"  placeholder="Create own password" required/><br></p>
 <p><label for="password2">Confirm Password:</label><input type=password name="password2"   placeholder="Re-enter your password" required/><br/></p>
 <input name="hash" type="hidden" value=""></input>
@@ -42,5 +41,6 @@
 </fieldset>
 </center>
 </form>
+<span></span>
 </body>
 </html>
