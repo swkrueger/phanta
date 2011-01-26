@@ -85,6 +85,7 @@ auth.register.POST = function(req, res) {
                     rclient.setnx("uid:"+uid+":hash", req.POSTcontent.hash, this.parallel());
                     rclient.setnx("uid:"+uid+":email", req.POSTcontent.email, this.parallel());
                     rclient.setnx("uid:"+uid+":cellphone", req.POSTcontent.cellphone, this.parallel());
+                    rclient.zadd("usernames", 0, user, this.parallel());
                 },
                 function showPage(err) {
                     if (err) return mkError(500, "Database error")(req, res);
@@ -131,20 +132,17 @@ auth.checkSession = function(req, res, handler) {
 
 auth.listall = { };
 auth.listall.GET = function(req, res) {
-    auth.search("*", req, res);
-};
-auth.search = function(pattern, req, res) {
-    rclient.keys("username:"+pattern+":uid", function (err, keys) {
+    var start = req.params.start || 0;
+    var count = req.params.count-1 || -1;
+    rclient.zrange("usernames", start, start+count, function (err, keys) {
         if (err) return mkError(500, "Database error [keys]")(req, res);
-        //rclient.convertMultiBulkBuffersToUTF8Strings(keys);
         console.log(keys);
-        var keyarr = [];
-        keys.replace(/username:([^\:]+):uid/g, function() {
-            keyarr.push(arguments[1]);
+        return res.simpleJSON(200, {
+            usernames: keys,
         });
-        console.log(keyarr);
     });
-}
+};
+auth.search ={ }
 auth.search.GET = function(req, res) {
 
 }
