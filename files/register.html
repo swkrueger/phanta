@@ -7,15 +7,15 @@
 <script type="text/javascript">
  $(document).ready(function(){
     $("form[name=register]").submit(function(event){       
-	if ($(event.target.password1.value!=event.target.password2.value)) {
-		$("span").text("Passwords do not Macth").show().fadeOut(1000);
-		return false;
-	}
-      	var hash=hex_hash(event.target.email.value + event.target.password1.value);
+	if ($(event.target.password1.value==event.target.password2.value)) {
+		var hash=hex_hash(event.target.email.value + event.target.password1.value);
 	event.target.password1.value="";
 	event.target.password2.value="";
 	event.target.hash.value=hash;
 	return true;
+	}
+      	$("span").text("Passwords do not Macth").show().fadeOut(1000);
+		return false;
 	});
 });
 </script>
