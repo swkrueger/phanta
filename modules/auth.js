@@ -25,8 +25,8 @@ auth.login.POST = function(req, res) {
     // Extract POST data
     user = req.POSTcontent.username;
     hashreq = req.POSTcontent.hash;
-    if (user=="" || user===undefined) return mkError(400, 'No username specified')();
-    if (hashreq=="" || hashreq===undefined) return mkError(400, 'No hash specified')();
+    if (user=="" || user===undefined) return mkError(400, 'No username specified')(req, res);
+    if (hashreq=="" || hashreq===undefined) return mkError(400, 'No hash specified')(req, res);
     // Get UID from database
     rclient.get("username:"+user+":uid", function(err, uid) {
         if (err) return mkError(500, "Database error")(req, res);
@@ -63,8 +63,8 @@ auth.register.POST = function(req, res) {
     // Extract POST data
     if (req.POSTcontent.email) user = req.POSTcontent.email;
     else user = req.POSTcontent.cellphone;
-    if (user=="" || user===undefined) return mkError(400, 'No username specified')();
-    if (req.POSTcontent.hash=="" || req.POSTcontent.hash===undefined) return mkError(400, 'No hash specified')();
+    if (user=="" || user===undefined) return mkError(400, 'No username specified')(req, res);
+    if (req.POSTcontent.hash=="" || req.POSTcontent.hash===undefined) return mkError(400, 'No hash specified')(req, res);
     req.POSTcontent.username = user;
     // TODO: Check for integrity
     sys.debug("Registering new user '"+user+"'.");
