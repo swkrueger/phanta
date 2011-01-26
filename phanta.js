@@ -197,7 +197,7 @@ startServer = function() {
 
         res.simpleJSON = function(code, obj) {
             var body = JSON.stringify(obj);
-            res._headers['Content-Type'] = 'text/html';
+            res._headers['Content-Type'] = 'text/plain';
             //res._headers['Content-Type'] = 'text/json';
             res._headers['Content-Length'] = body.length;
             res.writeHead(code, res._headers);
@@ -242,11 +242,6 @@ var options = [
   , description : 'The hostname phanta server must bind to'
   , value       : true
   , callback    : function (host) { HOST = host; } // override host value
-  },
-  { short       : 'a'
-  , long        : 'bind-all'
-  , description : 'Bind hostname to all addresses'
-  , callback    : function (host) { HOST = ""; } // override host value
   },
   { short       : 'p'
   , long        : 'port'
