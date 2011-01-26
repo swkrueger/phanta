@@ -11,10 +11,10 @@
 		$("span").text("Passwords do not Macth").show().fadeOut(1000);
 		return false;
 	}
-      	var hash=hex_hash(event.target.email.value + event.target.password1.value);
+      	var hash=hex_sha1(event.target.email.value + event.target.password1.value);
 	event.target.password1.value="";
 	event.target.password2.value="";
-	event.target.hash.value=hash;
+	event.target.sha1.value=hash;
 	return true;
 	});
 });
@@ -34,7 +34,7 @@
 <p><span></span></p>
 <p><label for="password1">Password:</label><input type="password" id="password1" name="hash" placeholder="Create own password" required/><br></p>
 <p><label for="password2">Confirm Password:</label><input id="password2" type=password onforminput="setCustomValidity(value != password1.value ? 'Passwords do not match.' : '')" placeholder="Re-enter your password" required/><br/></p>
-<input name="hash" type="hidden" value=""></input>
+<input name="sha1" type="hidden" value=""></input>
 <p> <h6>Please note, the password must be at least 6 characters.</h6></p>
 
 <p  class="submit"><input type="submit" value="Submit"  class="submit"><input type="reset" value="Reset"/></p>
