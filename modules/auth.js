@@ -25,6 +25,8 @@ auth.login.POST = function(req, res) {
     // Extract POST data
     user = req.POSTcontent.username;
     hashreq = req.POSTcontent.hash;
+    if (user=="" || user===undefined) return mkError(400, 'No username specified');
+    if (hashreq=="" || hashreq===undefined) return mkError(400, 'No hash specified');
     // Get UID from database
     rclient.get("username:"+user+":uid", function(err, uid) {
         if (err) return mkError(500, "Database error")(req, res);
@@ -55,9 +57,14 @@ auth.login.POST = function(req, res) {
 
 auth.register = {};
 auth.register.POST = function(req, res) {
+    // TODO: Check whether a password is set
+    // TODO: Check whether a username was specified (undefined)
+    // TODO: Username may not have a space
     // Extract POST data
     if (req.POSTcontent.email) user = req.POSTcontent.email;
     else user = req.POSTcontent.cellphone;
+    if (user=="" || user===undefined) return mkError(400, 'No username specified');
+    if (req.POSTcontent.hash=="" || req.POSTcontent.hash===undefined) return mkError(400, 'No hash specified');
     req.POSTcontent.username = user;
     // TODO: Check for integrity
     sys.debug("Registering new user '"+user+"'.");
@@ -121,5 +128,31 @@ auth.checkSession = function(req, res, handler) {
         handler(req, res);
     });
 }
+
+auth.listall = { };
+auth.listall.GET = function(req, res) {
+    auth.search("*", req, res);
+};
+auth.search = function(pattern, req, res) {
+    rclient.keys("username:"+pattern+":uid", function (err, keys) {
+        if (err) return mkError(500, "Database error [keys]")(req, res);
+        //rclient.convertMultiBulkBuffersToUTF8Strings(keys);
+        console.log(keys);
+        var keyarr = [];
+        keys.replace(/username:([^\:]+):uid/g, function() {
+            keyarr.push(arguments[1]);
+        });
+        console.log(keyarr);
+    });
+}
+auth.search.GET = function(req, res) {
+
+}
+
+
+
+// List users
+
+// Search users (wildcard)
 
 
