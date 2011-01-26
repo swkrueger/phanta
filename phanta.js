@@ -45,7 +45,6 @@ modules = {};
 ////
 // Load modules:
 //  Maps all modules in /modules/ in an array
-//  Assume all the files in /modules/ are .js  FIXME
 ////
 load_modules = function(callback) {
     console.log("Loading modules...");
@@ -76,7 +75,6 @@ load_modules = function(callback) {
 ////
 mkError = function(code, description) {
     return function(req, res) {
-        //res.writeHTML(code, "<h1>Error</h1><h2>"+description+"</h2>");
         res.simpleJSON(code, {
             error: description
         });
@@ -164,6 +162,7 @@ dispatch_module = function(req) {
         return false;
     }
     var func = 'modules[modname].'+funcname;
+    // TODO: Check for "subfunctions", eg. /auth/user/register --> auth.user.register
     // TODO: Check whether type exists - the following fail, because of you type
     // in /auth/test.jpg, it will fail
     if (eval(func)===undefined) {
