@@ -14,7 +14,7 @@
       	var hash=hex_hash(event.target.email.value + event.target.password1.value);
 	event.target.password1.value="";
 	event.target.password2.value="";
-	event.target.sha1.value=hash;
+	event.target.hash.value=hash;
 	return true;
 	});
 });
@@ -32,8 +32,8 @@
 <p><label for="cellphone">Cellphone:</label><input type="text" name="cellphone" placeholder="eg +27 709 0000 000"/><br/></p>
 <p> <h6>Please Use International format only : eg  +27 76... </h6></p>
 <p><span></span></p>
-<p><label for="password1">Password:</label><input type="password" name="password1"  placeholder="Create own password" required/><br></p>"
-<p><label for="password2">Confirm Password:</label><input name="password2" type=password onforminput="setCustomValidity(value != password1.value ? 'Passwords do not match.' : '')" placeholder="Re-enter your password" required/><br/></p>
+<p><label for="password1">Password:</label><input type="password" name="password1"  placeholder="Create own password" required/><br></p>
+<p><label for="password2">Confirm Password:</label><input type=password name="password2"   placeholder="Re-enter your password" required/><br/></p>
 <input name="hash" type="hidden" value=""></input>
 <p> <h6>Please note, the password must be at least 6 characters.</h6></p>
 
