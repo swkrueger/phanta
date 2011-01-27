@@ -2,21 +2,49 @@
 <head>
 <title>Register new user</title>
 <link href="/css/forms.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript" src="/js/sha1-min.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function(){
+    $("form[name=register]").submit(function(event){       
+	if (event.target.email.value==''&& event.target.cellphone.value=='') {
+            $("span").text("Please type your e-mail address and or cellphone").show().fadeOut(10000);
+	    return false;
+	}
+	if (event.target.password1.value==event.target.password2.value) {
+	    var user;
+	    if (event.target.email.value!="") user=event.target.email.value;
+	    else user=event.target.cellphone.value;
+	    var hash=hex_sha1(user + event.target.password1.value);
+	    event.target.password1.value="";
+	    event.target.password2.value="";
+	    event.target.hash.value=hash;
+	    return true;
+	} else {
+      	    $("span").text("Passwords do not Match").show().fadeOut(10000);
+	    return false;
+        }
+    });
+});
+</script>
 </head>
 <body>
 <center>
 <fieldset>
 <legend>User Registration Form</legend>
 <h1><i>Phanta.org</i></h1>
-<form action="/auth/register" method="POST">
+<form name="register" action="/auth/register" method="POST">
 <p><label for="email">E-mail:</label><input type="email" name="email" placeholder="Type your email here" required/></p>
-<p> <h6>Example:user@phanta.org</h6></p>
+<p> <h6>Example:user@phanta.oorg</h6></p>
 <h4>OR</h4>
 <p><label for="cellphone">Cellphone:</label><input type="text" name="cellphone" placeholder="eg +27 709 0000 000"/><br/></p>
-<p> <h6>Please Use International format only : eg  +27 76... </h6></p>
-<p><label for="password">Password:</label><input type="password" id="password1" name="hash" placeholder="Create own password" required/><br></p>
-<p><label for="password2">Confirm Password:</label><input id="password2" type=password onforminput="setCustomValidity(value != password1.value ? 'Passwords do not match.' : '')" placeholder="Re-enter your password" required/><br/></p>
 
+<p> <h6>Please Use International format only : eg  +27 76... </h6></p>
+<p><label for="password1">Password:</label><input type="password" name="password1"  placeholder="Create own password" required/><br></p>
+<p><label for="password2">Confirm Password:</label><input type=password name="password2"   placeholder="Re-enter your password" required/><br/></p>
+<span style="color:red"></span>
+<input name="hash" type="hidden" value=""></input>
 <p> <h6>Please note, the password must be at least 6 characters.</h6></p>
 
 <p  class="submit"><input type="submit" value="Submit"  class="submit"><input type="reset" value="Reset"/></p>
@@ -24,5 +52,6 @@
 </fieldset>
 </center>
 </form>
+
 </body>
 </html>

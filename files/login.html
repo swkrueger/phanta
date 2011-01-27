@@ -2,15 +2,28 @@
 <head>
 <title>Login</title>
 <link href="/css/forms.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript" src="/js/sha1-min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("form[name=login]").submit(function(event) {
+            var hash = hex_sha1(event.target.username.value + event.target.password.value);
+            event.target.password.value = "";
+            event.target.hash.value = hash;
+            return true;
+        });
+    });
+</script>
 </head>
 <body>
 <center>
 <fieldset>
 <legend>Log in</legend>
 <h1><i>Phanta.org</i></h1>
-<form action="/auth/login" method="POST">
+<form name="login" action="/auth/login" method="POST">
 <p><label for="username">Username:</label><input type="text" name="username"/></p>
-<p><label for="password">Password:</label><input type="password" name="hash"/><br/></p>
+<p><label for="password">Password:</label><input type="password" name="password"/><br/></p>
+<input name="hash" type="hidden" value=""></input>
 <input type="checkbox" name="remember" value="login" />Remember me
 <p  class="submit"><input type="submit" value="Sign-Up"
 class="submit"><input type="submit" value="Submit"/></p>

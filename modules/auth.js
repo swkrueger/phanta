@@ -25,6 +25,8 @@ auth.login.POST = function(req, res) {
     // Extract POST data
     user = req.POSTcontent.username;
     hashreq = req.POSTcontent.hash;
+    if (user=="" || user===undefined) return mkError(400, 'No username specified')(req, res);
+    if (hashreq=="" || hashreq===undefined) return mkError(400, 'No hash specified')(req, res);
     // Get UID from database
     rclient.get("username:"+user+":uid", function(err, uid) {
         if (err) return mkError(500, "Database error")(req, res);
@@ -55,9 +57,14 @@ auth.login.POST = function(req, res) {
 
 auth.register = {};
 auth.register.POST = function(req, res) {
+    // TODO: Check whether a password is set
+    // TODO: Check whether a username was specified (undefined)
+    // TODO: Username may not have a space
     // Extract POST data
     if (req.POSTcontent.email) user = req.POSTcontent.email;
     else user = req.POSTcontent.cellphone;
+    if (user=="" || user===undefined) return mkError(400, 'No username specified')(req, res);
+    if (req.POSTcontent.hash=="" || req.POSTcontent.hash===undefined) return mkError(400, 'No hash specified')(req, res);
     req.POSTcontent.username = user;
     // TODO: Check for integrity
     sys.debug("Registering new user '"+user+"'.");
@@ -78,6 +85,7 @@ auth.register.POST = function(req, res) {
                     rclient.setnx("uid:"+uid+":hash", req.POSTcontent.hash, this.parallel());
                     rclient.setnx("uid:"+uid+":email", req.POSTcontent.email, this.parallel());
                     rclient.setnx("uid:"+uid+":cellphone", req.POSTcontent.cellphone, this.parallel());
+                    rclient.zadd("usernames", 0, user, this.parallel());
                 },
                 function showPage(err) {
                     if (err) return mkError(500, "Database error")(req, res);
@@ -121,5 +129,28 @@ auth.checkSession = function(req, res, handler) {
         handler(req, res);
     });
 }
+
+auth.listall = { };
+auth.listall.GET = function(req, res) {
+    var start = req.params.start || 0;
+    var count = req.params.count-1 || -1;
+    rclient.zrange("usernames", start, start+count, function (err, keys) {
+        if (err) return mkError(500, "Database error [keys]")(req, res);
+        console.log(keys);
+        return res.simpleJSON(200, {
+            usernames: keys,
+        });
+    });
+};
+auth.search ={ }
+auth.search.GET = function(req, res) {
+
+}
+
+
+
+// List users
+
+// Search users (wildcard)
 
 

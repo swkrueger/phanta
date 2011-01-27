@@ -10,7 +10,6 @@
 //                                      //
 //////////////////////////////////////////
 
-// TODO: Argument to specify port and host
 // TODO: Cleanup code + debug output
 // TODO: Test code
 // TODO: Validations, check POST data (eg. whether username is set)
@@ -26,16 +25,15 @@ var sys=require('sys'),
 
 //// NPM requirements: redis, opts, sesh
 
+// TODO: Put globals in global array
 ////
 // Globals
 ////
 VERSION="0.01 alpha";
 // HOST: HTTP server host
-//HOST="127.0.0.1";
-HOST="";
+HOST="127.0.0.1";
 // PORT: HTTP server port
-//PORT=8124;
-PORT=80;
+PORT=8080;
 // MODULES_PATH: Directory containing all modules
 MODULES_PATH="./modules/";
 // DIRECTORY_INDEX: Filename to append to a file request ending with "/"
@@ -47,7 +45,6 @@ modules = {};
 ////
 // Load modules:
 //  Maps all modules in /modules/ in an array
-//  Assume all the files in /modules/ are .js  FIXME
 ////
 load_modules = function(callback) {
     console.log("Loading modules...");
@@ -88,7 +85,8 @@ mkError = function(code, description) {
 // Not found
 ////
 not_found = function(req, res) {
-    res.writeText(404, 'Not Found');
+    //res.writeText(404, 'Not Found');
+    res.writeHTML(404, '<h1>404 Not Found</h1>');
 };
 
 ////
@@ -155,12 +153,16 @@ load_file = function(filename) {
 dispatch_module = function(req) {
     var modname = req.path[0];
     var funcname = req.path[1];
+    // There may not be a dot in the funcname, else the dispatcher will fail if
+    // the function doesn't exist
     if (funcname=="" || funcname===undefined) funcname = "index";
+    funcname = funcname.replace(".", "_");
     if (modules[modname]===undefined) {
         sys.debug("Module '"+modname+ "' does not exist");
         return false;
     }
     var func = 'modules[modname].'+funcname;
+    // TODO: Check for "subfunctions", eg. /auth/user/register --> auth.user.register
     // TODO: Check whether type exists - the following fail, because of you type
     // in /auth/test.jpg, it will fail
     if (eval(func)===undefined) {
@@ -194,7 +196,8 @@ startServer = function() {
 
         res.simpleJSON = function(code, obj) {
             var body = JSON.stringify(obj);
-            res._headers['Content-Type'] = 'text/json';
+            res._headers['Content-Type'] = 'text/plain';
+            //res._headers['Content-Type'] = 'text/json';
             res._headers['Content-Length'] = body.length;
             res.writeHead(code, res._headers);
             res.write(body);
