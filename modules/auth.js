@@ -91,6 +91,7 @@ auth.register.POST = function(req, res) {
                     if (err) return mkError(500, "Database error")(req, res);
                     res.simpleJSON(201, { ok: "User created" });
                     console.log("Registered user '"+user+"' with UID "+uid);
+                    // TODO: automatically login when finished registering
                 }
                 );
         });
@@ -129,28 +130,4 @@ auth.checkSession = function(req, res, handler) {
         handler(req, res);
     });
 }
-
-auth.listall = { };
-auth.listall.GET = function(req, res) {
-    var start = req.params.start || 0;
-    var count = req.params.count-1 || -1;
-    rclient.zrange("usernames", start, start+count, function (err, keys) {
-        if (err) return mkError(500, "Database error [keys]")(req, res);
-        console.log(keys);
-        return res.simpleJSON(200, {
-            usernames: keys,
-        });
-    });
-};
-auth.search ={ }
-auth.search.GET = function(req, res) {
-
-}
-
-
-
-// List users
-
-// Search users (wildcard)
-
 
