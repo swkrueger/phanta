@@ -14,7 +14,7 @@ $(document).ready(function(){
 	}
 	if (event.target.password1.value==event.target.password2.value) {
 	    var user;
-	    if (event.target.email.value=="") user=event.target.email.value;
+	    if (event.target.email.value!="") user=event.target.email.value;
 	    else user=event.target.cellphone.value;
 	    var hash=hex_sha1(user + event.target.password1.value);
 	    event.target.password1.value="";
