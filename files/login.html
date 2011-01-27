@@ -3,11 +3,11 @@
 <title>Login</title>
 <link href="/css/forms.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="/js/jquery.js"></script>
-<script type="text/javascript" src="/js/md5-min.js"></script>
+<script type="text/javascript" src="/js/sha1-min.js"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         $("form[name=login]").submit(function(event) {
-            var hash = hex_sha1(event.target.username.value + event.target.username.password);
+            var hash = hex_sha1(event.target.username.value + event.target.password.value);
             event.target.password.value = "";
             event.target.hash.value = hash;
             return true;
