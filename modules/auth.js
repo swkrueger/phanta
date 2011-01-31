@@ -13,46 +13,46 @@ var sessions = {};
 auth.session = { };
 auth.session.GET = function(req, res) {
     return res.simpleJSON(200, {
-        user: req.session.data.user,
-        authorized: req.session.data.user!="Guest"
-        }
-    );
+        userid     : req.session.data.userid,
+        username   : req.session.data.username,
+        authorized : req.session.data.username!="Guest"
+    });
 }
 
 auth.login = { };
 auth.login.POST = function(req, res) {
     // TODO: Show "already logged in"
     // Extract POST data
-    user = req.data.username;
+    username = req.data.username;
     hashreq = req.data.hash;
-    if (user=="" || user===undefined) return mkError(400, 'No username specified')(req, res);
+    if (username=="" || username===undefined) return mkError(400, 'No username specified')(req, res);
     if (hashreq=="" || hashreq===undefined) return mkError(400, 'No hash specified')(req, res);
     if  (req.session.data.user!="Guest") {
 		res._headers['Location'] = '/';
         return res.writeHTML(302, '<h1>Already logged in. Redirecting...</h1>');
 	}
-    // Get UID from database
-    rclient.get("username:"+user+":uid", function(err, uid) {
+    // Get USERID from database
+    rclient.get("username:"+username+":userid", function(err, userid) {
         if (err) return mkError(500, "Database error")(req, res);
         // User doesn't exist in database
-        if (uid===null) {
-            console.log("Login failed: User '"+user+"' does not exist");
+        if (userid===null) {
+            console.log("Login failed: User '"+username+"' does not exist");
             return auth.unauthorized(req, res);
         }
-        // Save UID in session data
-        req.session.data.uid = uid;
+        // Save USERID in session data
+        req.session.data.userid = userid;
         // Get hash from database
-        rclient.get("uid:"+uid+":hash", function(err, hashdb) {
+        rclient.get("userid:"+userid+":hash", function(err, hashdb) {
             if (err) return mkError(500, "Database error")(req, res);
             // Is the hash correct?
             if (hashreq==hashdb) {  // Yes
-                console.log("User '"+user+"' has sucessfully logged in");
-                req.session.data.user = user;
+                console.log("User '"+username+"' has sucessfully logged in");
+                req.session.data.username = username;
                 res._headers['Location'] = '/';
                 //res.writeText(302, 'Sucessfully logged in. Redirecting...');
                 res.writeHTML(302, '<h1>Redirecting...</h1>');
             } else {  // No
-                console.log("Login failed for user '"+user+"': Incorrect password");
+                console.log("Login failed for user '"+username+"': Incorrect password");
                 return auth.unauthorized(req, res);
             }
         });
@@ -65,38 +65,37 @@ auth.register.POST = function(req, res) {
     // TODO: Check whether a username was specified (undefined)
     // TODO: Username may not have a space
     // Extract POST data
-    if (req.data.email) user = req.data.email;
-    else user = req.data.cellphone;
-    if (user=="" || user===undefined) return mkError(400, 'No username specified')(req, res);
+    if (req.data.email) username = req.data.email;
+    else username = req.data.cellphone;
+    if (username=="" || username===undefined) return mkError(400, 'No username specified')(req, res);
     if (req.data.hash=="" || req.data.hash===undefined) return mkError(400, 'No hash specified')(req, res);
-    req.data.username = user;
+    req.data.username = username;
     // TODO: Check for integrity
-    sys.debug("Registering new user '"+user+"'.");
-    rclient.exists("username:"+user+":uid", function(err, exists) {
+    sys.debug("Registering new user '"+username+"'.");
+    rclient.exists("username:"+username+":userid", function(err, exists) {
         if (err) return mkError(500, "Database error")(req, res);
         // Username already exists?
         if (exists) {
-            console.log("Registration of user '"+user+"' failed: Username already exist");
+            console.log("Registration of user '"+username+"' failed: Username already exist");
             return res.simpleJSON(409, { failed: "Username already exists" });
         }
-        rclient.incr("globals:uid", function(err, uid) {
-            if (err || uid===null) return mkError(500, "Database error")(req, res);
-            Step(
-                function storeValues() {
+        rclient.incr("next:userid", function(err, userid) {
+            if (err || userid===null) return mkError(500, "Database error")(req, res);
+            Step(function storeValues() {
                     // Store values in database
-                    rclient.setnx("username:"+user+":uid", uid, this.parallel());
-                    rclient.setnx("uid:"+uid+":username", user, this.parallel());
-                    rclient.setnx("uid:"+uid+":hash", req.data.hash, this.parallel());
-                    rclient.setnx("uid:"+uid+":email", req.data.email, this.parallel());
-                    rclient.setnx("uid:"+uid+":cellphone", req.data.cellphone, this.parallel());
-                    rclient.zadd("usernames", 0, user, this.parallel());
+                    rclient.setnx("username:"+username+":userid", userid, this.parallel());
+                    rclient.setnx("userid:"+userid+":username", username, this.parallel());
+                    rclient.setnx("userid:"+userid+":hash", req.data.hash, this.parallel());
+                    rclient.setnx("userid:"+userid+":email", req.data.email, this.parallel());
+                    rclient.setnx("userid:"+userid+":cellphone", req.data.cellphone, this.parallel());
+                    rclient.zadd("usernames", 0, username, this.parallel());
                 },
                 function showPage(err) {
                     if (err) return mkError(500, "Database error")(req, res);
                     res.simpleJSON(201, { ok: "User created" });
-                    console.log("Registered user '"+user+"' with UID "+uid);
-                }
-                );
+                    console.log("Registered user '"+username+"' with USERID "+userid);
+                    // TODO: automatically login when finished registering
+                });
         });
     });
 
@@ -104,7 +103,7 @@ auth.register.POST = function(req, res) {
 
 auth.logoff = { };
 auth.logoff.GET = function(req, res) {
-    req.session.data.user = "Guest";
+    req.session.data.username = "Guest";
 	res.simpleJSON(200, {
         ok: "logged off"
 	});
@@ -129,32 +128,8 @@ auth.checkSession = function(req, res, handler) {
     // refresh expire
     //console.log();
     session(req, res, function(req, res) {
-        if (req.session.data.user=="Guest" && handler.authReq===true) auth.unauthorized(req, res);
+        if (req.session.data.username=="Guest" && handler.authReq===true) auth.unauthorized(req, res);
         handler(req, res);
     });
 }
-
-auth.listall = { };
-auth.listall.GET = function(req, res) {
-    var start = req.params.start || 0;
-    var count = req.params.count-1 || -1;
-    rclient.zrange("usernames", start, start+count, function (err, keys) {
-        if (err) return mkError(500, "Database error [keys]")(req, res);
-        console.log(keys);
-        return res.simpleJSON(200, {
-            usernames: keys,
-        });
-    });
-};
-auth.search ={ }
-auth.search.GET = function(req, res) {
-
-}
-
-
-
-// List users
-
-// Search users (wildcard)
-
 
