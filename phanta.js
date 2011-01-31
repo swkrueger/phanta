@@ -194,10 +194,12 @@ startServer = function() {
     http.createServer(function (req, res) {
         console.log("Received HTTP request for the URL "+req.url);
         res._headers = {};
-        req.uri = url.parse(req.url).pathname;
-        req.path = req.uri.split("/");
+        var a = url.parse(unescape(req.url), true);
+        req.uri   = a.pathname;
+        req.path  = req.uri.split("/");
+        req.query = a.query;
         req.path.shift();
-	    req.params = qs.parse(url.parse(req.url).query);
+        req.params = qs.parse(url.parse(req.url).query);
         var handler = dispatch_module(req) || load_file('./files'+req.uri) || not_found;
 
         res.simpleJSON = function(code, obj) {
