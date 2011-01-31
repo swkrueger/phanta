@@ -75,7 +75,7 @@ auth.register.POST = function(req, res) {
             console.log("Registration of user '"+username+"' failed: Username already exist");
             return res.simpleJSON(409, { failed: "Username already exists" });
         }
-        rclient.incr("globals:userid", function(err, userid) {
+        rclient.incr("next:userid", function(err, userid) {
             if (err || userid===null) return mkError(500, "Database error")(req, res);
             Step(function storeValues() {
                     // Store values in database
