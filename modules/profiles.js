@@ -5,19 +5,34 @@ var sys=require('sys'),
 
 profiles = exports;
 
+// curl -X GET http://127.0.0.1:8080/profiles/list
 profiles.list = { };
 profiles.list.GET = function(req, res) {
     var start = parseInt(req.params.start) || 0;
     var count = parseInt(req.params.count)-1 || 20;
-    console.log("Get list of usernames: start="+start+"; count="+count);
-    rclient.zrange("usernames", start, start+count, function (err, keys) {
-        if (err) return mkError(500, "Database error [keys]")(req, res);
-        console.log(keys);
-        return res.simpleJSON(200, {
-            usernames: keys,
+    console.log("Get list of profiles: start="+start+"; count="+count);
+
+    return rclient.zrange("usernames:userid", start, start+count, function(err, userids) {
+        if (err) return res.mkError(500, err)(req, res);
+        var multi = rclient.multi();
+        for (var i in userids) {
+            multi.get("userid:" + userids[i] + ":profile")
+                 .smembers("userid:" + userids[i] + ":followers")
+                 .smembers("userid:" + userids[i] + ":following");
+        }
+        multi.exec(function(err, reply) {
+            var profiles = [];
+            for (var i=0; i<reply.length;) {
+                var profile = JSON.parse(reply[i++]);
+                profile.followers = reply[i++];
+                profile.following = reply[i++];
+                profiles.push(profile);
+            }
+            return res.simpleJSON(200, profiles);
         });
     });
 };
+
 profiles.search ={ };
 profiles.search.GET = function(req, res) {
     var q = req.params.q;

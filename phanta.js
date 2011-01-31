@@ -109,7 +109,7 @@ POST_handler = function(req, callback)
                 return;
             } catch (e) { }
             try {
-                req.data = querystring.parse(_CONTENT);
+                req.data = qs.parse(_CONTENT);
             } catch (e) { }
             callback();
         });
