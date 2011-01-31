@@ -23,8 +23,8 @@ auth.login = { };
 auth.login.POST = function(req, res) {
     // TODO: Show "already logged in"
     // Extract POST data
-    user = req.POSTcontent.username;
-    hashreq = req.POSTcontent.hash;
+    user = req.data.username;
+    hashreq = req.data.hash;
     if (user=="" || user===undefined) return mkError(400, 'No username specified')(req, res);
     if (hashreq=="" || hashreq===undefined) return mkError(400, 'No hash specified')(req, res);
     // Get UID from database
@@ -61,11 +61,11 @@ auth.register.POST = function(req, res) {
     // TODO: Check whether a username was specified (undefined)
     // TODO: Username may not have a space
     // Extract POST data
-    if (req.POSTcontent.email) user = req.POSTcontent.email;
-    else user = req.POSTcontent.cellphone;
+    if (req.data.email) user = req.data.email;
+    else user = req.data.cellphone;
     if (user=="" || user===undefined) return mkError(400, 'No username specified')(req, res);
-    if (req.POSTcontent.hash=="" || req.POSTcontent.hash===undefined) return mkError(400, 'No hash specified')(req, res);
-    req.POSTcontent.username = user;
+    if (req.data.hash=="" || req.data.hash===undefined) return mkError(400, 'No hash specified')(req, res);
+    req.data.username = user;
     // TODO: Check for integrity
     sys.debug("Registering new user '"+user+"'.");
     rclient.exists("username:"+user+":uid", function(err, exists) {
@@ -82,9 +82,9 @@ auth.register.POST = function(req, res) {
                     // Store values in database
                     rclient.setnx("username:"+user+":uid", uid, this.parallel());
                     rclient.setnx("uid:"+uid+":username", user, this.parallel());
-                    rclient.setnx("uid:"+uid+":hash", req.POSTcontent.hash, this.parallel());
-                    rclient.setnx("uid:"+uid+":email", req.POSTcontent.email, this.parallel());
-                    rclient.setnx("uid:"+uid+":cellphone", req.POSTcontent.cellphone, this.parallel());
+                    rclient.setnx("uid:"+uid+":hash", req.data.hash, this.parallel());
+                    rclient.setnx("uid:"+uid+":email", req.data.email, this.parallel());
+                    rclient.setnx("uid:"+uid+":cellphone", req.data.cellphone, this.parallel());
                     rclient.zadd("usernames", 0, user, this.parallel());
                 },
                 function showPage(err) {
