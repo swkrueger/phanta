@@ -5,6 +5,8 @@ var sys=require('sys'),
 
 sys.debug("loaded module " + __filename);
 
+var pubsub = require("./pubsub");
+
 profiles = exports;
 
 // curl -X GET http://127.0.0.1:8080/profiles/list
@@ -92,3 +94,62 @@ profiles.search.GET = function(req, res) {
 
 
 
+
+// following -> POST /profiles/following { username|userid : <username|userid> }
+//              follow username or userid
+// following -> DELETE /profiles/following?[username|userid=]
+//              unfollow username or userid
+// ccurl -X POST -d '{"username":"antoine@7degrees.co.za"}' "http://127.0.0.1:8080/profiles/following"
+// ccurl -X DELETE "http://127.0.0.1:8080/profiles/following?username=antoine@7degrees.co.za"
+profiles.following = {
+  POST : function(request, response) {
+    if (!request.session.data.authorized) return response.fin(401, "not logged in");
+    if (!request.data.username && !request.data.userid) return response.fin(400, "specify username or userid");
+    var client = request.session.redis();
+    if (request.data.username) { // if username specified, need to look up uid
+      return client.get("username:" + request.data.username + ":userid", function(error, userid) {
+        if (error) return response.fin(500, error);
+        if (!userid) return response.fin(404, "no username:" + request.data.username);
+        follow(userid);
+      });
+    }
+    follow(request.data.userid);
+    function follow(userid) {
+      client.multi()
+          .get ("userid:" + userid + ":username")
+          .sadd("userid:" + request.session.data.userid + ":following", userid)
+          .sadd("userid:" + userid + ":followers", request.session.data.userid)
+          .exec(function(error, reply) {
+            if (error) return response.fin(500, error);
+            if (!reply[0]) return response.fin(404, "no username found for userid:" + userid);
+            request.data.channel = reply[0];
+            return pubsub.subscribers.POST(request, response);
+          });
+    }
+  },
+
+  DELETE : function(request, response) {
+    if (!request.session.data.authorized)           return response.fin(401, "not logged in");
+    if (!request.query.username && !request.query.userid) return response.fin(400, "specify username or userid");
+    var client = request.session.redis();
+    if (request.query.username) { // if username specified, need to look up uid
+      return client.get("username:" + request.query.username + ":userid", function(error, userid) {
+        if (error) return response.fin(500, error);
+        unfollow(userid);
+      });
+    }
+    unfollow(request.query.userid);
+    function unfollow(userid) {
+      client.multi()
+          .get ("userid:" + userid + ":channelid")
+          .srem("userid:" + request.session.data.userid + ":following", userid)
+          .srem("userid:" + userid + ":followers", request.session.data.userid)
+          .exec(function(error, reply) {
+            if (error) return response.fin(500, error);
+            if (!reply[0]) return response.fin(500, "no channelid found for userid:" + userid);
+            request.query.channelid = reply[0];
+            return pubsub.subscribers.DELETE(request, response);
+          });
+    }
+  }
+};
