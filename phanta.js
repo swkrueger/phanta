@@ -105,7 +105,7 @@ POST_handler = function(req, callback)
         req.addListener('end', function() {
             try {
                 req.data = JSON.parse(_CONTENT);
-                return;
+                return callback();
             } catch (e) { }
             try {
                 req.data = qs.parse(_CONTENT);

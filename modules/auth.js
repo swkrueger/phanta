@@ -15,7 +15,7 @@ auth.session.GET = function(req, res) {
     return res.simpleJSON(200, {
         userid     : req.session.data.userid,
         username   : req.session.data.username,
-        authorized : req.session.data.username!="Guest"
+        authorized : req.session.data.authorized
     });
 }
 
@@ -25,11 +25,13 @@ auth.login.POST = function(req, res) {
     // Extract POST data
     username = req.data.username;
     hashreq = req.data.hash;
+    console.log(username);
+    console.log(hashreq);
     if (username=="" || username===undefined) return mkError(400, 'No username specified')(req, res);
     if (hashreq=="" || hashreq===undefined) return mkError(400, 'No hash specified')(req, res);
     if  (req.session.data.user!="Guest") {
-		res._headers['Location'] = '/';
-        return res.writeHTML(302, '<h1>Already logged in. Redirecting...</h1>');
+		  res._headers['Location'] = '/';
+      return res.writeHTML(302, '<h1>Already logged in. Redirecting...</h1>');
 	}
     // Get USERID from database
     rclient.get("username:"+username+":userid", function(err, userid) {
@@ -48,6 +50,7 @@ auth.login.POST = function(req, res) {
             if (hashreq==hashdb) {  // Yes
                 console.log("User '"+username+"' has sucessfully logged in");
                 req.session.data.username = username;
+                req.session.data.authorized = true;
                 res._headers['Location'] = '/';
                 //res.writeText(302, 'Sucessfully logged in. Redirecting...');
                 res.writeHTML(302, '<h1>Redirecting...</h1>');
