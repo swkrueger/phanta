@@ -122,12 +122,13 @@ POST_handler = function(req, callback)
 //  TODO: Cache files
 ////
 load_file = function(filename) {
+    // TODO: Update file handler!!!
 	var body;
     sys.debug("-- Enter load_file function");
     if (filename.charAt(filename.length-1)=="/") filename+=DIRECTORY_INDEX;
 
 	function loadResponseData(callback) {
-		fs.readFile(filename, function(err, data) {
+		fs.readFile(filename, "binary", function(err, data) {
 			if (err) {
 				sys.debug('Error loading file ' + filename);
 			} else {
@@ -145,7 +146,9 @@ load_file = function(filename) {
                 return not_found(req, res);
             }
             loadResponseData(function() {
-                res.writeHTML(200, body);
+                res.writeHead(200);
+                res.write(body, "binary");
+                res.end();
             });
         });
     };
