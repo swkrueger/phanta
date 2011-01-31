@@ -4,7 +4,7 @@ var sys=require('sys'),
     util=require('../util'),
     Step = require('../lib/step.js');
 
-sys.debug("  auth module to your service!");
+sys.debug("loaded module " + __filename);
 
 auth = exports;
 

@@ -3,6 +3,8 @@ var sys=require('sys'),
     util=require('../util'),
     Step = require('../lib/step.js');
 
+sys.debug("loaded module " + __filename);
+
 profiles = exports;
 
 // curl -X GET http://127.0.0.1:8080/profiles/list
@@ -43,24 +45,24 @@ profiles.search.GET = function(req, res) {
     results = [];
     Step(
         function addTempKey() {
-            rclient.zadd("usernames", 0, q, this.parallel());
-            rclient.zadd("usernames", 0, last, this.parallel());
+            rclient.zadd("usernames:username", 0, q, this.parallel());
+            rclient.zadd("usernames:username", 0, last, this.parallel());
         },
         function getIndex(err, result, lresult) {
             if (err) return mkError(500, err.stack)(req, res);
             creatednew = result;
             lcreatednew = lresult;
-            rclient.zrank("usernames", q, this.parallel());
-            rclient.zrank("usernames", last, this.parallel());
+            rclient.zrank("usernames:username", q, this.parallel());
+            rclient.zrank("usernames:username", last, this.parallel());
         },
         function delTempKey(err, r, lr) {
             if (err) return mkError(500, err.stack)(req, res);
             rank = r;
             lrank = lr;
-            if (creatednew==1) rclient.zrem("usernames", q, this.parallel());
+            if (creatednew==1) rclient.zrem("usernames:username", q, this.parallel());
             if (lcreatednew==1) {
                 lrank--;
-                rclient.zrem("usernames", last, this.parallel());
+                rclient.zrem("usernames:username", last, this.parallel());
             }
             if (creatednew==0 && lcreatednew==0) this(false, 2, 2);
         },
@@ -71,7 +73,7 @@ profiles.search.GET = function(req, res) {
             var stop = start+count;
             if (lrank<stop) stop=lrank;
             console.log("Getting usernames from "+start+" to "+stop);
-            rclient.zrange("usernames", start, stop-1, this);
+            rclient.zrange("usernames:username", start, stop-1, this);
         },
         function returnResults(err, keys) {
             if (err) return mkError(500, err.stack)(req, res);
