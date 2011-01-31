@@ -6,14 +6,14 @@
 <script type="text/javascript" src="/js/villagebus.js"></script>
 <script type="text/javascript">
     $(document).ready(function(){
-        villagebus.GET("/profile/list",function(error,profiles){
+        villagebus.GET("/profiles/list",function(error,profiles){
             if (error){
                 $("form[name=follow]").style.display ="show";
                 return false;
             }
 
-            var arr = ["simcelile.mafunda@gmail.com","simce@phanta.com", "sizah@gmail.com"];
-            jQuery.each(arr, function(i, name) {
+            //var arr = ["simcelile.mafunda@gmail.com","simce@phanta.com", "sizah@gmail.com"];
+            jQuery.each(profiles, function(i, name) {
                 $("<div class=\"follow\">"+name+"</div>").appendTo("div#follow");
                 return true;
             });
