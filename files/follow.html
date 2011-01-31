@@ -2,21 +2,43 @@
 <head>
 <title>Follow</title>
 <link href="/css/forms.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/js/villagebus.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        villagebus.GET("/profile/list",function(error,profiles){
+            if (error){
+                $("form[name=follow]").style.display ="show";
+                return false;
+            }
+
+            var arr = ["simcelile.mafunda@gmail.com","simce@phanta.com", "sizah@gmail.com"];
+            jQuery.each(arr, function(i, name) {
+                $("<div class=\"follow\">"+name+"</div>").appendTo("div#follow");
+                return true;
+            });
+        });
+    });
+</script>
 </head>
 <body>
+<div align="right">
 <input type="text" name="Search" placeholder="Please search field here"/>
 <input type="submit" value="Go" />
+</div>
 <center>
 <fieldset>
-<form>
+<form name="follow" action="/profile/list[?start,count]" method="GET">
 
-<div>
+<div id="class">
 <h2> Profile's Page </h2>
-<div align="left" style="border:1px solid red">
+<div  align="left" style="border:1px solid red">
 Name : Bronkhorst Maneiry</br>
 Location : Mpumalanga</br>
 User Designation:Farmer</br>
-Contacts:Cell- 0909889987 E-mail:-bmarneiry@phanta.net</br>
+Contacts:Cell- 0909889987 E-simcelile.mafunda@gmail.com
+person@domain.com
+me@gmail.commail:-bmarneiry@phanta.net</br>
 </div>
 <p>
 <div align="left" style="border:1px solid red">
@@ -27,8 +49,9 @@ Contacts:Cell-07899 22345E-mail:-Sizah@phanta.net</br>
 </div>
 <p>
 <div align="left" style="border:1px solid red">
-Name : Simcelile Mafunda</br>
+Name : Simcelile Mafunda</br><div class=\"follow\"></div>
 Location : Matataile</br>
+
 User Designation:Project Leader</br>
 Contacts:Cell-078 5848040E-mail:-simcard@phanta.net</br>
 </div>
@@ -46,7 +69,8 @@ Location : Rosebank</br>
 User Designation:Agriculturalist</br>
 Contacts:Cell-0783445 565 E-mail:-unga@phanta.net</br>
 </div>
-
+<div id="follow">
+</div>
 
 
 
@@ -55,7 +79,7 @@ Contacts:Cell-0783445 565 E-mail:-unga@phanta.net</br>
 </div>
 </form>
 <p>
-<div align="right"/>
+<div align="center"/>
 <input type="button" name="Next" value="Next"/> <input type="button" name="Back" value="Previous"/> 
 </div>
 </body>
