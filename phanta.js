@@ -25,31 +25,31 @@ var sys=require('sys'),
 
 //// NPM requirements: redis, opts, sesh
 
-// TODO: Put globals in global array
 ////
 // Globals
 ////
-VERSION="0.01 alpha";
-// HOST: HTTP server host
-HOST="127.0.0.1";
-// PORT: HTTP server port
-PORT=8080;
-// MODULES_PATH: Directory containing all modules
-MODULES_PATH="./modules/";
-// DIRECTORY_INDEX: Filename to append to a file request ending with "/"
-DIRECTORY_INDEX="index.html";
+GLOBALS = {
+    'VERSION': "0.01 alpha",
+    // HOST: HTTP server host
+    'HOST': "127.0.0.1",
+    // PORT: HTTP server port
+    'PORT': 8080,
+    // MODULES_PATH: Directory containing all modules
+    'MODULES_PATH': "./modules/",
+    // DIRECTORY_INDEX: Filename to append to a file request ending with "/"
+    'DIRECTORY_INDEX': "index.html"
+};
 
 modules = {};
 
-
 ////
 // Load modules:
-//  Maps all modules in /modules/ in an array
+//  Maps all modules in /modules/ into an array
 ////
 load_modules = function(callback) {
     console.log("Loading modules...");
     // Get the filenames of all files in /modules/
-    fs.readdir(MODULES_PATH, function (err, files) {
+    fs.readdir(GLOBALS['MODULES_PATH'], function (err, files) {
         var count = files.length,
         // Map the filenames to funtions loading the modules
         actions = files.map(function(filename) {
@@ -58,7 +58,7 @@ load_modules = function(callback) {
             modname = path.basename(filename, '.js');
             sys.debug("Mapping module "+modname);
             // Load the module
-            modules[modname] = require(MODULES_PATH+filename);
+            modules[modname] = require(GLOBALS['MODULES_PATH']+filename);
             return function(callback) { callback(); };
             });
         // Run the funtions
@@ -85,7 +85,6 @@ mkError = function(code, description) {
 // Not found
 ////
 not_found = function(req, res) {
-    //res.writeText(404, 'Not Found');
     res.writeHTML(404, '<h1>404 Not Found</h1>');
 };
 
@@ -109,7 +108,7 @@ POST_handler = function(req, callback)
                 return;
             } catch (e) { }
             try {
-                req.data = querystring.parse(_CONTENT);
+                req.data = qs.parse(_CONTENT);
             } catch (e) { }
             callback();
         });
@@ -125,7 +124,7 @@ load_file = function(filename) {
     // TODO: Update file handler!!!
 	var body;
     sys.debug("-- Enter load_file function");
-    if (filename.charAt(filename.length-1)=="/") filename+=DIRECTORY_INDEX;
+    if (filename.charAt(filename.length-1)=="/") filename+=GLOBALS['DIRECTORY_INDEX'];
 
 	function loadResponseData(callback) {
 		fs.readFile(filename, "binary", function(err, data) {
@@ -160,33 +159,22 @@ load_file = function(filename) {
 // Dispatch module
 ////
 dispatch_module = function(req) {
-    var modname = req.path[0];
-    var funcname = req.path[1];
-    // There may not be a dot in the funcname, else the dispatcher will fail if
-    // the function doesn't exist
-    if (funcname=="" || funcname===undefined) funcname = "index";
-    funcname = funcname.replace(".", "_");
-    if (modules[modname]===undefined) {
+    // TODO: output debug info
+    var module = modules[req.path[0]];
+    if (!module) {
         sys.debug("Module '"+modname+ "' does not exist");
         return false;
     }
-    var func = 'modules[modname].'+funcname;
-    // TODO: Check for "subfunctions", eg. /auth/user/register --> auth.user.register
-    // TODO: Check whether type exists - the following fail, because of you type
-    // in /auth/test.jpg, it will fail
-    if (eval(func)===undefined) {
-        sys.debug(func+" does not exist");
-        return mkError(404, "Module '"+modname+ "' function '"+funcname+"' does not exist");
-    }
-    func = func+'.'+req.method;
-    if (typeof eval(func) != 'function') {
-        sys.debug(func+" does not exist");
-        return mkError(501, "Module '"+modname+ "' function '"+funcname+"' method '"+req.method+"' not implemented");
-    }
-    sys.debug("Dispatch to module '"+modname+"' function '"+funcname+"' method '"+req.method+"'");
+    console.log(".. dispatch to module "+req.path[0]);
     req.path.shift();
-    req.path.shift();
-    return eval(func);
+    var func = module;
+    while (req.path && func[req.path]) {
+        console.log(".. dispatch down to "+req.path[0]);
+        func = func[req.path.shift()];
+    }
+    if (func[req.method]) return func[req.method];
+    else if (func) return func;
+    else return mkError(501, "Could not dispatch");
 };
 
 ////
@@ -205,6 +193,17 @@ startServer = function() {
         req.params = qs.parse(url.parse(req.url).query);
         var handler = dispatch_module(req) || load_file('./files'+req.uri) || not_found;
 
+        res.fin = function(status, reply, type, headers, module) {
+            status  = status  ? status         : 200;
+            headers = headers ? headers        : {};
+            module  = module  ? module + ": "  : "";
+            type  = type  ? type               : "text/plain";
+            console.log("fin " + module + status + " " + reply + " " + type);
+            headers["Content-Type"] = type;
+            res.writeHead(status, headers);
+            if (reply) res.write(JSON.stringify(reply));
+            res.end();
+        };
         res.simpleJSON = function(code, obj) {
             var body = JSON.stringify(obj);
             res._headers['Content-Type'] = 'text/plain';
@@ -237,27 +236,27 @@ startServer = function() {
                 modules['auth'].checkSession(req, res, handler);
             }
         });
-    }).listen(PORT, HOST);
-    console.log("Server at http://" + HOST + ':' + PORT.toString() + '/');
+    }).listen(GLOBALS['PORT'], GLOBALS['HOST']);
+    console.log("Server at http://" + GLOBALS['HOST'] + ':' + GLOBALS['PORT'].toString() + '/');
 }
 
 var options = [
   { short       : 'v'
   , long        : 'version'
   , description : 'Show version and exit'
-  , callback    : function () { console.log('v'+VERSION); process.exit(1); }
+  , callback    : function () { console.log('v'+GLOBALS['VERSION']); process.exit(1); }
   },
   { short       : 'h'
   , long        : 'host'
   , description : 'The hostname phanta server must bind to'
   , value       : true
-  , callback    : function (host) { HOST = host; } // override host value
+  , callback    : function (host) { GLOBALS['HOST'] = host; } // override host value
   },
   { short       : 'p'
   , long        : 'port'
   , description : 'The port phanta server must bind to'
   , value       : true
-  , callback    : function (port) { PORT = port; }
+  , callback    : function (port) { GLOBALS['PORT'] = port; }
   },
 ];
 

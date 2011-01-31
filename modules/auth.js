@@ -4,7 +4,7 @@ var sys=require('sys'),
     util=require('../util'),
     Step = require('../lib/step.js');
 
-sys.debug("  auth module to your service!");
+sys.debug("loaded module " + __filename);
 
 auth = exports;
 
@@ -65,6 +65,7 @@ auth.register.POST = function(req, res) {
     // TODO: Check whether a username was specified (undefined)
     // TODO: Username may not have a space
     // Extract POST data
+    var username;
     if (req.data.email) username = req.data.email;
     else username = req.data.cellphone;
     if (username=="" || username===undefined) return mkError(400, 'No username specified')(req, res);
@@ -81,14 +82,20 @@ auth.register.POST = function(req, res) {
         }
         rclient.incr("next:userid", function(err, userid) {
             if (err || userid===null) return mkError(500, "Database error")(req, res);
+            var profile = { userid : userid,
+                            username : username };
             Step(function storeValues() {
                     // Store values in database
-                    rclient.setnx("username:"+username+":userid", userid, this.parallel());
-                    rclient.setnx("userid:"+userid+":username", username, this.parallel());
-                    rclient.setnx("userid:"+userid+":hash", req.data.hash, this.parallel());
-                    rclient.setnx("userid:"+userid+":email", req.data.email, this.parallel());
-                    rclient.setnx("userid:"+userid+":cellphone", req.data.cellphone, this.parallel());
-                    rclient.zadd("usernames", 0, username, this.parallel());
+                    rclient.multi()
+                        .mset([ "username:"+username+":userid", userid,
+                                "userid:"+userid+ ":profile",  JSON.stringify(profile),
+                                "userid:"+userid+":username", username,
+                                "userid:"+userid+":hash", req.data.hash,
+                                "userid:"+userid+":email", req.data.email,
+                                "userid:"+userid+":cellphone", req.data.cellphone ])
+                        .zadd("usernames:username", 0, username)
+                        .zadd("usernames:userid", 0, userid)
+                        .exec(this.parallel());
                 },
                 function showPage(err) {
                     if (err) return mkError(500, "Database error")(req, res);
