@@ -27,6 +27,10 @@ auth.login.POST = function(req, res) {
     hashreq = req.data.hash;
     if (user=="" || user===undefined) return mkError(400, 'No username specified')(req, res);
     if (hashreq=="" || hashreq===undefined) return mkError(400, 'No hash specified')(req, res);
+    if  (req.session.data.user!="Guest") {
+		res._headers['Location'] = '/';
+        return res.writeHTML(302, '<h1>Already logged in. Redirecting...</h1>');
+	}
     // Get UID from database
     rclient.get("username:"+user+":uid", function(err, uid) {
         if (err) return mkError(500, "Database error")(req, res);
