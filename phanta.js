@@ -109,8 +109,8 @@ POST_handler = function(req, callback)
             } catch (e) { }
             try {
                 req.data = qs.parse(_CONTENT);
+                return callback();
             } catch (e) { }
-            callback();
         });
     } else callback();
 };
@@ -206,7 +206,7 @@ startServer = function() {
         };
         res.simpleJSON = function(code, obj) {
             var body = JSON.stringify(obj);
-            res._headers['Content-Type'] = 'text/plain';
+            res._headers['Content-Type'] = 'text/json';
             //res._headers['Content-Type'] = 'text/json';
             res._headers['Content-Length'] = body.length;
             res.writeHead(code, res._headers);
