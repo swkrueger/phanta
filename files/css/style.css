@@ -127,9 +127,9 @@ h1 {
     margin:0px;
 }
 .searchinput {
-    width:97px;
+    width:160px;
     height:18px;
-    float:left;
+    float:none;
     margin:5px 0 0 5px;
     font-family: Arial;
     font-size:10px;
@@ -140,8 +140,8 @@ h1 {
 	{
 		/*width:51px;
 		height:21px;*/
-		float:left;
-        margin:5px 0 0 5px;
+		float:right;
+        margin:1px 11px 5px 5px;
 		padding:0px;
 	}
 .button

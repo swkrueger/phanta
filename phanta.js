@@ -24,7 +24,7 @@ var sys=require('sys'),
     opts = require('opts'),
     util=require('./util');
 
-//// NPM requirements: redis, opts, sesh
+//// NPM requirements: redis, opts, sesh, multipart
 
 ////
 // Globals
@@ -113,7 +113,7 @@ POST_handler = function(req, callback)
 {
     if (req.method == 'POST') {
         req.setEncoding("binary"); // otherwise multipart gets nuked
-        req.data = {};
+        _CONTENT = {};
         var _CONTENT = '';
         // Load chucks of POST data
         req.addListener('data', function(chunk) {
@@ -121,7 +121,7 @@ POST_handler = function(req, callback)
         });
         // Parse data as multipart, JSON or QueryString and load into request object 
         req.addListener('end', function() {
-            if (req.data && req.data.substring(0, 4) == "----") {
+            if (_CONTENT && _CONTENT.substring(0, 4) == "----") {
                 var data = {};
                 var parser = multipart.parser();
                 var fields = {};
@@ -135,10 +135,10 @@ POST_handler = function(req, callback)
                 };
                 parser.ondata = function (chunk) { buffer += chunk; };
                 parser.onend = function () { 
-                    req.data  = fields;
+                    _CONTENT  = fields;
                     req.files = files;
                 };
-                parser.write(req.data);
+                parser.write(_CONTENT);
                 parser.close();
                 return;
             }

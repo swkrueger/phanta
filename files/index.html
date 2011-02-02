@@ -5,9 +5,11 @@
     <title>Phanta</title>
     <link href="/css/style.css" rel="stylesheet" type="text/css" />
     <link rel="icon" href="/css/images/icon.ico" />
+	<link rel="stylesheet" type="text/css" href="/css/jquery.autocomplete.css">
     <script type="text/javascript" src="/js/jquery.js"></script>
     <script type="text/javascript" src="/js/villagebus.js"></script>
     <script type="text/javascript" src="/js/sha1-min.js"></script>
+	<script type="text/javascript" src="/js/jquery.autocomplete.js"></script>
     <script type="text/javascript" src="/js/main.js"></script>
 </head>
 
@@ -55,10 +57,10 @@
             </div>
             <div id="search" class="authed">
                 <div id="searchblank">
-                    <h2>Follow someone</h2>
-                    <input name="textfield" type="text" class="searchinput" id="textfield" placeholder="Enter username" />
+                    <h2>Add people to follow</h2>
+                    <input name="textfield" type="text" class="searchinput textfield" id="profilesearch" placeholder="Enter username" /><br />
+                    <a href="#" id="browseprofiles">Browse all profiles</a>
                     <div id="searchbutton"><a href="#" class="button">Add</a></div>
-                    <p>Browse users</p>
                 </div>
             </div>
             <div class="sidebar authed" id="sidefollowing">
