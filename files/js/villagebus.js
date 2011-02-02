@@ -48,7 +48,7 @@ villagebus.http = function(rest, continuation) { // { verb, host, port, path, qu
   xhr.open(rest.verb, rest.path, continuation != null);
   xhr.onreadystatechange = function() {
     if (xhr.readyState != 4) return; // TODO handle all error states
-    //console.log("GOT: " + xhr.responseText);
+    console.log("GOT: " + xhr.responseText);
     try {
       var response = JSON.parse(xhr.responseText);
       if (response.error) {
