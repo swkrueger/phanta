@@ -40,6 +40,22 @@ GLOBALS = {
     'DIRECTORY_INDEX': "index.html"
 };
 
+// fix response.writeHead
+var _writeHead = http.ServerResponse.prototype.writeHead;
+http.ServerResponse.prototype.setHeader = function (key, value) {
+  this._additionalHeaders = this._additionalHeaders || {}; 
+  this._additionalHeaders[key] = value;
+};
+http.ServerResponse.prototype.writeHead = function (status, headers) {
+  var that = this;
+  if (this._additionalHeaders) {
+    Object.keys(this._additionalHeaders).forEach(function (k) {
+      headers[k] = headers[k] || that._additionalHeaders[k];
+    });
+  }
+  _writeHead.call(this, status, headers);
+};
+
 modules = {};
 
 ////
@@ -193,7 +209,7 @@ startServer = function() {
         req.params = qs.parse(url.parse(req.url).query);
         var handler = dispatch_module(req) || load_file('./files'+req.uri) || not_found;
 
-        res.fin = function(status, reply, type, headers, module) {
+        res.fin = function(status, reply, headers, type, module) {
             status  = status  ? status         : 200;
             headers = headers ? headers        : {};
             module  = module  ? module + ": "  : "";

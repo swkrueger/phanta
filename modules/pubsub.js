@@ -136,7 +136,7 @@ exports.POST = function(request, response) {
           multi.exec(function(error, reply) {
             if (error || !reply) return response.fin(500, error ? error : "null replies on message post");
             response.fin(302, messageid, { // redirect
-              'Location' : '/villagebus.tests.html'
+              'Location' : '/'
             });
           });
         });    
