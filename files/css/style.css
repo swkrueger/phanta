@@ -792,7 +792,8 @@ a#browseprofiles:hover {
 }
 
 .msgimg img {
-    height: 80px;
+    height: 120px;
+    display: inline;
 }
 
 
