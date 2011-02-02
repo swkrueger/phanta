@@ -107,7 +107,7 @@ exports.POST = function(request, response) {
   if (request.files && Object.keys(request.files)[0]) { // message has a file attached, include it
     filename = Object.keys(request.files)[0];
     message.image = filename; // TODO should only be set after save
-    fs.writeFile("webroot/uploads/" + filename, 
+    fs.writeFile("files/upload/" + filename, 
                  request.files[filename], "binary", function(error) { // TODO: store data in redis, not local filesystem
       if (error) console.log("ERROR SAVING FILE: " + error);
       console.log("saved: " + filename);
@@ -145,7 +145,7 @@ exports.POST = function(request, response) {
           multi.exec(function(error, reply) {
             if (error || !reply) return response.fin(500, error ? error : "null replies on message post");
             response.fin(302, messageid, { // redirect
-              'Location' : '/villagebus.tests.html'
+              'Location' : '/'
             });
           });
         });    

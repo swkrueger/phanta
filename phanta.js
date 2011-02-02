@@ -135,12 +135,12 @@ POST_handler = function(req, callback)
                 };
                 parser.ondata = function (chunk) { buffer += chunk; };
                 parser.onend = function () { 
-                    _CONTENT  = fields;
+                    req.data  = fields;
                     req.files = files;
                 };
                 parser.write(_CONTENT);
                 parser.close();
-                return;
+                return callback();
             }
             try {
                 req.data = JSON.parse(_CONTENT);

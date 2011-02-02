@@ -144,6 +144,18 @@ h1 {
         margin:1px 11px 5px 5px;
 		padding:0px;
 	}
+#searchall {
+    margin:4px 0 0 0;
+    float:left;
+}
+a#browseprofiles {
+    font-weight:bold;
+    color:#000;
+    text-decoration:none;
+}
+a#browseprofiles:hover {
+    color:#444;
+}
 .button
 	{
 		width:51px;
@@ -779,6 +791,10 @@ h1 {
     margin: 3px 0 0 10px;
 }
 
+.msgimg img {
+    height: 80px;
+}
+
 
 /*  LOGIN  */
 
@@ -835,4 +851,14 @@ span.unfollowbtn {
 	background-color:#4a513d;
     padding: 0 2px 0 2px;
     cursor: pointer;
+    z-index: 100;
 }
+
+/* Overlay */
+#simplemodal-overlay {background-color:#aaaaaa; cursor:wait;}
+
+/* Container */
+#simplemodal-container {height:300px; width:200px; background-color:#fff; border:1px solid #000000; -moz-border-radius: 5px; }
+#simplemodal-container a.modalCloseImg {background:url('../images/x.png') no-repeat; width:25px; height:29px; display:inline; z-index:3200; position:absolute; top:-15px; left:-18px; cursor:pointer;}
+#simplemodal-container #basicModalContent {padding:8px;}
+

@@ -10,6 +10,7 @@
     <script type="text/javascript" src="/js/villagebus.js"></script>
     <script type="text/javascript" src="/js/sha1-min.js"></script>
 	<script type="text/javascript" src="/js/jquery.autocomplete.js"></script>
+    <script type="text/javascript" src="/js/jquery.simplemodal.1.4.1.min.js"></script>
     <script type="text/javascript" src="/js/main.js"></script>
 </head>
 
@@ -30,9 +31,10 @@
         <div id="main">
             <div id="publish" class="authed">
                 <h1>Post a message</h1>
-                <form name="publish" action="/pubsub/publish" method="POST">
+                <form name="publish" action="/pubsub/publish" method="POST" enctype="multipart/form-data">
                     <input type="hidden" name="dummy" value="foobar" />
                     <textarea name="message" rows="3" cols="68" placeholder="Write something here"></textarea><br />
+                    Upload photo (optional):<input type="file" name="image" size="20" accept="image/jpeg">
                     <input value="Post" class="button" name="post" id="post" type="submit" /><br />
                 </form>
             </div>
@@ -59,8 +61,10 @@
                 <div id="searchblank">
                     <h2>Add people to follow</h2>
                     <input name="textfield" type="text" class="searchinput textfield" id="profilesearch" placeholder="Enter username" /><br />
-                    <a href="#" id="browseprofiles">Browse all profiles</a>
-                    <div id="searchbutton"><a href="#" class="button">Add</a></div>
+                    <div id="searchall"><a href="#" id="browseprofiles">Browse all profiles</a></div>
+                    <div id="searchbutton"><a href="#" id="dofollow" class="button">Follow</a></div>
+                </div>
+                <div id="profilesbox" style='display:none'>
                 </div>
             </div>
             <div class="sidebar authed" id="sidefollowing">
@@ -79,6 +83,7 @@
         <div id="footerlinks"><a href="#" class="footerlinks">Home</a> | <a href="#" class="footerlinks">Register</a></div>
     </div>
 </div>
+
 
 </body>
 </html>
