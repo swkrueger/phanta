@@ -12,6 +12,42 @@
 <script type="text/javascript" src="/js/loginbox.js"></script>
 <script type="text/javascript" src="/js/jquery.simplemodal.1.4.1.min.js"></script>
 <script type="text/javascript">
+    function loadtimeline() {
+        villagebus.GET("/pubsub",function(error,msgs){
+            if (error){
+                // TODO: Show error message
+                return false;
+            }
+
+            var timeline = $("div#timeline");
+            jQuery.each(msgs, function(i, msg) {
+                timeline.append("<div class=\"msg\">"+msg.username+": "+msg.message+"</div");
+                return true;
+            });
+            // TODO: Show "no messages"
+        });
+
+    }
+    function populate_profile() {
+        villagebus.GET("/profiles",function(error,profile){
+            console.log(profile.username);
+            var following = $("div#following");
+            following.html("");
+            jQuery.each(profile.following, function(i, follower) {
+                following.append("<li class=\"follower\">"+follower.username+"</li>");
+                return true;
+            });
+            if (following.html()=="") following.html("<li>You are not following any people</li>");
+            var followers = $("div#followers");
+            followers.html("");
+            jQuery.each(profile.followers, function(i, follower) {
+                followers.append("<li class=\"follower\">"+follower.username+"</li>");
+                return true;
+            });
+            if (followers.html()=="") followers.html("<li>No people are following you</li>");
+        });
+
+    }
     function checklogin() {
         console.log("I'm here");
         villagebus.GET("/auth/session", function(error, session) {
@@ -24,6 +60,9 @@
             $("#auth-register").hide();
             $("#auth-login").hide();
             $("#auth-logoff").show();
+            $("div#timeline").html("");
+            loadtimeline();
+            populate_profile();
           } else {
             $("#auth-status").html("Not logged in");
             $("#auth-register").show();
@@ -80,15 +119,19 @@
           <h5>Following</h5>
         </div>
         <div id="morelinks">
-          <div class="date">12.01.08</div>
-          <div class="linkblank"><a href="#" class="link">Scelerisque amassa suspendisse</a></div>
+            <ul>
+            <div id="following">
+            </div>
+            </ul>
         </div>
         <div id="morelinksheading">
           <h5>Followers</h5>
         </div>
         <div id="morelinks">
-          <div class="date">12.01.08</div>
-          <div class="linkblank"><a href="#" class="link">Scelerisque amassa suspendisse</a></div>
+            <ul>
+            <div id="followers">
+            </div>
+            </ul>
         </div>
       </div>
   </div>

@@ -37,6 +37,38 @@ profiles.list.GET = function(req, res) {
     });
 };
 
+profiles.GET = function(req, res) {
+    var userid = req.params.userid || req.session.data.userid;
+    // TODO: Error if no userid
+    rclient.multi().get("userid:" + userid + ":profile")
+         .smembers("userid:" + userid + ":followers")
+         .smembers("userid:" + userid + ":following")
+         .exec(function(err, reply) {
+            var profile = JSON.parse(reply[0]);
+            if (!profile) return mkError(404, "Not found")(req, res);
+            getprofiles(reply[1], function(err, followers) {
+                if (err) return res.mkError(500, err)(req, res);
+                followers = followers.map(function(follower) { return JSON.parse(follower) });
+                getprofiles(reply[2], function(err, following) {
+                    if (err) return res.mkError(500, err)(req, res);
+                    following = following.map(function(follower) { return JSON.parse(follower) });
+                    profile.followers = followers;
+                    profile.following = following;
+                    return res.simpleJSON(200, profile);
+                });
+            });
+         });
+    function getprofiles(userids, callback) {
+        var multi = rclient.multi();
+        for (var i in userids) {
+            userid = userids[i];
+            multi.get("userid:" + userid + ":profile");
+        }
+        multi.exec(callback);
+    }
+
+}
+
 profiles.search ={ };
 profiles.search.GET = function(req, res) {
     var q = req.params.q;

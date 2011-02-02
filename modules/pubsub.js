@@ -141,6 +141,7 @@ exports.POST = function(request, response) {
         });    
   };
 };
+exports.POST.authReq = true;
 
 
 // poll -> GET /pubsub?[channel|lastn|daterange] -> <messages>
@@ -160,6 +161,7 @@ exports.GET = function(request, response) {
     });
   });
 };
+exports.GET.authReq = true;
 
 
 // subscribers -> POST /pubsub { channel|channelid : <channel|channelid> } -> ?
