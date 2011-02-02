@@ -70,10 +70,10 @@ profiles.GET = function(req, res) {
 }
 
 
-// profiles -> PUT /profiles {} 
+// profiles -> POST /profiles {} 
 //             Update the profile of the currently logged in user
-// ccurl -X PUT -d '{"userid":1,"username":"antoine@7degrees.co.za","longitude":0.0,"latitude":0.0}' "http://127.0.0.1:8000/profiles"
-exports.PUT = function(request, response) {
+// ccurl -X POST -d '{"userid":1,"username":"antoine@7degrees.co.za","longitude":0.0,"latitude":0.0}' "http://127.0.0.1:8000/profiles"
+exports.POST = function(request, response) {
   if (!request.session.data.authorized) return response.fin(401, "not logged in");
   if (!request.data.userid || !request.data.username ||
       request.session.data.userid   != request.data.userid ||
