@@ -3,11 +3,13 @@
 <head>
   <link href="/css/forms.css" rel="stylesheet" type="text/css">
   <link href="/css/jquery-ui.css" rel="stylesheet" type="text/css">
-  <script src="/js/jquery-1.4.4.min.js"></script>
-  <script>
-    $(document).read(function() {
+  <script type="text/javascript" src="/js/jquery-1.4.4.min.js"></script>
+  <script type="text/javascript" src="/js/jquery-ui.min.js"></script>
 
-      $("#foo").datepicker();
+  <script>
+    $(document).ready(function() {
+
+      $("#datetrip").datepicker();
 
     });
   </script>
@@ -21,7 +23,7 @@
         <tr>
          <td>Date of trip:</td>
          <td> 
-         <input type="date" name="date">
+         <input type="date" name="date" id="datetrip">
          </td>
         </tr>
         <tr>
