@@ -96,7 +96,7 @@ function channel_create(client, userid, channel, continuation) {
 exports.POST = function(request, response) {
   if (!request.session.data.authorized) return response.fin(401, "not logged in");
   if (!request.data || !request.data.message) return response.fin(400, "invalid message");
-  var client = request.session.redis();
+  var client = request.redis();
   var message = {
     message   : request.data.message,
     timestamp : (new Date()).valueOf(),
@@ -149,7 +149,7 @@ exports.POST.authReq = true;
 // ccurl -X GET http://127.0.0.1:8000/pubsub
 exports.GET = function(request, response) {
   if (!request.session.data.authorized) return response.fin(401, "not logged in");
-  var client = request.session.redis();
+  var client = request.redis();
   return client.lrange("userid:" + request.session.data.userid + ":timeline", 0, -1, function(error, messageids) {
     if (error) return response.fin(500, error); 
     if (!messageids.length) return response.fin(200, []);
@@ -173,7 +173,7 @@ exports.subscribers = {
   POST : function(request, response) {
     if (!request.session.data.authorized) return response.fin(401, "not logged in");
     if (!request.data.channel && !request.data.channelid) return response.fin(400, "specify channel or channelid");
-    var client = request.session.redis();
+    var client = request.redis();
     if (request.data.channel) { // lookup channelid from channel name
       return client.get("channel:" + request.data.channel + ":channelid", function(error, channelid) {
         console.log("Tried to find channelid for: " + request.data.channel + " -> " + channelid);
@@ -200,7 +200,7 @@ exports.subscribers = {
   DELETE : function(request, response) {
     if (!request.session.data.authorized) return response.fin(401, "not logged in");
     if (!request.query.channel && !request.query.channelid) return response.fin(400, "specify channel or channelid");
-    var client = request.session.redis();
+    var client = request.redis();
     if (request.query.channel) {
       return client.get("channel:" + request.query.channel + ":channelid", function(error, channelid) {
         if (error) return response.fin(500, error);
@@ -224,7 +224,7 @@ exports.subscribers = {
 exports.purge = {
   DELETE : function(request, response) {
     console.log("purging...");
-    var client = request.session.redis();
+    var client = request.redis();
     var del = [ "channels:channel", "next:channelid", "next:messageid",
                 "channel:antoine@7degrees.co.za:channelid",
                 "channel:hummingbird@hivemind.net:channelid" ];
