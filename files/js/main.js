@@ -6,19 +6,19 @@ function loadtimeline() {
         }
 
         var timeline = $("div#timeline");
-        timeline.html("");
+        var html = "";
         jQuery.each(msgs, function(i, msg) {
             var add = "";
             if (msg.image) add += "<div class=\"msg\" style=\"min-height: 100px;\">";  // TODO: Change this hack into CSS
             else add += "<div class=\"msg\">";
             // TODO: Vertically align image in center
             if (msg.image) add+="<span class=\"msgimg\"><img src=\"/upload/"+msg.image+"\" /></span>";
-            add += "<span class=\"msgtext\">"+msg.username+": "+msg.message+"</span>";
-            add += "</div";
-            timeline.append(add);
-            if (msg.image) 
+            add += "<span class=\"msgtext\"><b>"+msg.username+":</b> "+msg.message+"</span>";
+            add += "</div>";
+            html += add;
             return true;
         });
+        timeline.html(html);
         if (msgs.length==0) {
             timeline.html("You don't have any messages. Follow some more people!");
         }
@@ -53,6 +53,9 @@ function populate_profile() {
             populate_profile();
             loadtimeline();
         });
+        var html = "<b>Username:</b> "+profile.name+"<br />";
+        html += "<b>Surname:</b> "+profile.surname+"<br />";
+        $("#myprofile").html(html);
     });
 
 }
@@ -64,15 +67,15 @@ function checklogin() {
         }
         console.log("Test:" + session.authorized);
         if (session.authorized) {
-        $("#auth-status").html("Logged in as <i>"+session.username+"</i>");
-        $("div#timeline").html("");
-        $(".notauthed").hide();
-        $(".authed").show();
-        populate_profile();
+            $("#auth-status").html("Logged in as <i>"+session.username+"</i>");
+            $("div#timeline").html("");
+            $(".notauthed").hide();
+            $(".authed").show();
+            populate_profile();
         } else {
-        $("#auth-status").html("Not logged in");
-        $(".authed").hide();
-        $(".notauthed").show();
+            $("#auth-status").html("Not logged in");
+            $(".authed").hide();
+            $(".notauthed").show();
         }
     });
     loadtimeline();
@@ -122,7 +125,7 @@ $(document).ready(function() {
         event.target.password.value = "";
         event.target.hash.value = hash;
 
-        var str = $(this).serialize();
+        //var str = $(this).serialize();
         villagebus.POST("/auth/login", {username: event.target.username.value, hash: hash}, function(error, response) {
             $('#ajax_loading').hide();
             if (error) return login_fail(error);
@@ -177,7 +180,7 @@ $(document).ready(function() {
             });
             html+="</ul>";
             output.html(html);
-            $('#profilesbox').modal();
+            $('#profilesbox').modal({containerCss: {width:250, height:350}});
             $("ul.profiles li.profile").click(function(event) {
                 $("#profilesearch").val(event.target.id);
                 $.modal.close();
@@ -185,5 +188,79 @@ $(document).ready(function() {
 
         });
     });
+    $("#chprofileclick").click(function(){
+   villagebus.GET("/profiles",function(error,profile){
+           console.log(profile);
+	   $("input[name=userid]").val(profile.userid);
+           $("input[name=username]").val(profile.username);
+           if (profile.name) $("input[name=name]").val(profile.name);
+           if (profile.surname) $("input[name=surname]").val(profile.surname);
+           if (profile.longitude) $("input[name=longitude]").val(profile.longitude);
+           if (profile.latitude) $("input[name=latitude]").val(profile.latitude);
+   });
+function success(position) {
+  var s = document.querySelector('#status');
+  if (s.className == 'success' ) {
+    // not sure why we're hitting this twice in FF, I think it's to do with a cached result coming back    
+    return;
+  }
+  s.innerHTML = "found you!";
+  s.className = 'success';
+  
+  var mapcanvas = document.createElement('div');
+  mapcanvas.id = 'mapcanvas';
+  mapcanvas.style.height = '200px';
+  mapcanvas.style.width = '330px';
+    
+  document.querySelector('#map').appendChild(mapcanvas);
+  
+  var latlng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+  var myOptions = {
+    zoom: 15,
+    center: latlng,
+    mapTypeControl: false,
+    navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+  };
+  var map = new google.maps.Map(document.getElementById("mapcanvas"), myOptions);
+  
+  var marker = new google.maps.Marker({
+      position: latlng, 
+      map: map,
+      draggable: true, 
+      title:"You are here!"
+  });
+  google.maps.event.addListener(marker, 'mouseup', function() {
+    console.log(marker.position);
+    $("input[name=longitude]").val(marker.position.xa);
+    $("input[name=latitude]").val(marker.position.za);
+  });
+
+}
+function error(msg) {
+  var s = document.querySelector('#status');
+  s.innerHTML = typeof msg == 'string' ? msg : "failed";
+  s.className = 'fail';
+  // console.log(arguments);
+}
+
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(success, error);
+} else {
+  error('not supported');
+}
+        $('#chprofilebox').modal({containerCss: {width:400, height:500}});
+
+    });
+    /*$("#chprofilesubmit").click(function(){
+        console.log("I'm here!");
+        var str = $("chprofileform").serialize();
+        villagebus.POST("/profiles", str, function(error, response) {
+            if (error) return login_fail(error);
+            loadtimeline();
+        });
+        return false;
+    });*/
+
 });
 

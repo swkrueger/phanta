@@ -82,9 +82,13 @@ exports.POST = function(request, response) {
   client.set("userid:" + request.session.data.userid + ":profile",
              JSON.stringify(request.data), function(error, userid) {
                if (error) return response.fin(500, error);
-               return response.fin(200, request.data);
+               //return response.fin(200, request.data);
+                    return response.fin(302, request.data, { // redirect
+                    'Location' : '/'
+                    });
              });
 };
+exports.POST.authReq = true;
 
 
 profiles.search ={ };

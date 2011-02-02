@@ -882,7 +882,33 @@ li.profile {
 #simplemodal-overlay {background-color:#aaaaaa; }
 
 /* Container */
-#simplemodal-container {height:350px; width:250px; background-color:#bbcd72; border:1px solid #000000; -moz-border-radius: 5px; }
+#simplemodal-container {height:400px; width:400px; background-color:#bbcd72; border:1px solid #000000; -moz-border-radius: 5px; }
 #simplemodal-container a.modalCloseImg {background:url('../images/x.png') no-repeat; width:25px; height:29px; display:inline; z-index:3200; position:absolute; top:-15px; left:-18px; cursor:pointer;}
-#simplemodal-container #basicModalContent {padding:8px;}
+#simplemodal-container #basicModalContent {padding:8px; margin: 5px;}
 
+.phorm label
+{
+width: 2em;
+float: left;
+margin-right: 0.5em;
+display: block
+}
+
+.phorm .submit input
+{
+/*margin-left: 4.5em;*/
+} 
+.phorm input.btn { 
+	  color:#050; 
+	  font: bold 84% 'trebuchet ms',helvetica,sans-serif; 
+	  background-color:#fed; 
+	  border: 1px solid; 
+  border-color: #696 #363 #363 #696; 
+}
+.phorm fieldset
+{
+}
+
+.phorm legend
+{
+}

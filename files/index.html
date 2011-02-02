@@ -11,6 +11,7 @@
     <script type="text/javascript" src="/js/sha1-min.js"></script>
 	<script type="text/javascript" src="/js/jquery.autocomplete.js"></script>
     <script type="text/javascript" src="/js/jquery.simplemodal.1.4.1.min.js"></script>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
     <script type="text/javascript" src="/js/main.js"></script>
 </head>
 
@@ -76,6 +77,28 @@
                 <h5>Followers</h5>
                 <ul class="followlist" id="followers">
                 </ul>
+            </div>
+            <div class="sidebar authed">
+                <h5>My Profile</h5>
+                <div id="myprofile">
+                    <b>Username: </b>Me<br />
+                </div>
+                <a href="#" id="chprofileclick">Change profile</a>
+                <div id="chprofilebox" style="display:none;">
+                    <center>
+                        <h1>Edit profile</h1>
+                        <form name="profile" id="chprofileform" class="phorm" method="POST" action="/profiles">
+                            <input type="hidden" name="userid"/>
+                            <p><label for="email">Username:</label><input type="email" name="username" readonly="readonly"/></p>
+                            <p><label for="Name">Name:</label><input type="text" name="name"/></p>
+                            <p><label for="Surname">Surname:</label><input type="text" name="surname"/></p>
+                            <p><label for="location">Location:</label><input type="text" name="longitude"/><br /><label>  </label><input type="text" name="latitude"/></p>
+                            <div id="status"></div>
+                            <div id="map"></div>
+                            <p><input type="submit" value="Save changes" name="save" id="chprofilesubmit"/></p>
+                        </form>
+                    </center>
+                </div>
             </div>
         </div>
     </div>
