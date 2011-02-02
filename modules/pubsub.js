@@ -128,7 +128,8 @@ exports.POST = function(request, response) {
           var multi = client.multi()
               .set("messageid:" + messageid + ":message", JSON.stringify(message))
               .zadd("channelid:" + channelid + ":timeline", (new Date()).valueOf(), messageid)
-              .lpush("userid:" + request.session.data.userid + ":timeline", messageid);
+              .lpush("userid:" + request.session.data.userid + ":timeline", messageid)
+              .lpush("userid:0:timeline", messageid); // global timeline
           for (var i in subscribers) {
             multi.lpush("userid:" + subscribers[i] + ":timeline", messageid);
           }
@@ -147,9 +148,10 @@ exports.POST = function(request, response) {
 //         if no channel specificied, then all messages from all channels associated with <userid>
 // ccurl -X GET http://127.0.0.1:8000/pubsub
 exports.GET = function(request, response) {
-  if (!request.session.data.authorized) return response.fin(401, "not logged in");
+  // global timeline if not logged in
+  var userid = request.session.data.authorized ? request.session.data.userid : 0;
   var client = request.redis();
-  return client.lrange("userid:" + request.session.data.userid + ":timeline", 0, -1, function(error, messageids) {
+  return client.lrange("userid:" + userid + ":timeline", 0, -1, function(error, messageids) {
     if (error) return response.fin(500, error); 
     if (!messageids.length) return response.fin(200, []);
     var q = messageids.map(function(messageid) { return "messageid:" + messageid + ":message"; });
