@@ -57,20 +57,17 @@
           console.log("Test:" + session.authorized);
           if (session.authorized) {
             $("#auth-status").html("Logged in as "+session.username);
-            $("#auth-register").hide();
-            $("#auth-login").hide();
-            $("#auth-logoff").show();
             $("div#timeline").html("");
-            loadtimeline();
+            $(".notauthed").hide();
+            $(".authed").show();
             populate_profile();
           } else {
             $("#auth-status").html("Not logged in");
-            $("#auth-register").show();
-            $("#auth-login").show();
-            $("#auth-logoff").hide();
+            $(".authed").hide();
+            $(".notauthed").show();
           }
         });
-
+        loadtimeline();
     }
     $(document).ready(function() {
         checklogin();
@@ -85,59 +82,63 @@
 </head>
 
 <body>
-<div id="main">
-    <div id="contenttxtblank">
-      <div id="menu">
-        <ul>
-          <li id="auth-status">You are not logged in</li>
-          <li id="auth-login"><a href="/login.html" id="loginbtn">Login</a></li>
-          <li id="auth-logoff"><a href="/auth/logoff" id="logoffbtn">Logoff</a></li>
-          <li id="auth-register"><a href="/register.html">Register</a></li>
-        </ul>
-      </div>
-      <h2 id="logo">Phanta</h2>
-      <div id="contentleft"><div id="lefttxtblank">
-        <h1>The timeline</h1>
-        <div id="timeline">
-            <div class="msg">Testo</div>
-        </div>
-
-      </div></div>
-      <div id="contentright">
-        <div id="search">
-          <div id="searchblank">
-            <div id="searchinput">
-              <label>
-                <input name="textfield" type="text" class="searchinput" id="textfield" value="Enter Keyword" />
-              </label>
-            </div>
-            <div id="searchbutton"><a href="#" class="search">Search</a></div>
-            <div id="advancesearch"><a href="#" class="advancesearch">Advance Search</a></div>
-          </div>
-        </div>
-        <div id="morelinksheading">
-          <h5>Following</h5>
-        </div>
-        <div id="morelinks">
+<div id="body">
+    <div id="content">
+        <div id="topbar">
             <ul>
-            <div id="following">
-            </div>
+                <li id="auth-status">You are not logged in</li>
+                <li id="auth-login" class="notauthed"><a href="/login.html" id="loginbtn">Login</a></li>
+                <li id="auth-logoff" class="authed"><a href="/auth/logoff" id="logoffbtn">Logoff</a></li>
+                <li id="auth-register" class="notauthed"><a href="/register.html">Register</a></li>
             </ul>
         </div>
-        <div id="morelinksheading">
-          <h5>Followers</h5>
+        <div id="header">
+            <h1>Phanta</h1>
         </div>
-        <div id="morelinks">
-            <ul>
-            <div id="followers">
+        <div id="main">
+            <div id="publish" class="authed">
+                <h1>Post a message</h1>
+                <form name="publish" action="/pubsub/publish" method="POST">
+                    <input type="hidden" name="dummy" value="foobar" />
+                    <textarea name="message" rows="3" cols="68" placeholder="Write something here"></textarea><br />
+                    <input value="Post" class="button" name="post" id="post" type="submit" /><br />
+                </form>
             </div>
-            </ul>
+            <h1>The timeline</h1>
+            <div id="timeline">
+                <div class="msg">Loading...</div>
+            </div>
         </div>
-      </div>
-  </div>
-  <div id="footerbg">
-    <div id="footerlinks"><a href="#" class="footerlinks">Home</a> | <a href="#" class="footerlinks">Register</a></div>
-  </div>
+        <div id="sidebars">
+            <div class="sidebar notauthed" id="sidelogin">
+                <h5>Login</h5>
+            </div>
+            <div id="search" class="authed">
+                <div id="searchblank">
+                    <h2>Follow someone</h2>
+                    <input name="textfield" type="text" class="searchinput" id="textfield" placeholder="Enter username" />
+                    <div id="searchbutton"><a href="#" class="button">Add</a></div>
+                </div>
+            </div>
+            <div class="sidebar authed" id="sidefollowing">
+                <h5>Following</h5>
+                <ul>
+                    <div id="following">
+                    </div>
+                </ul>
+            </div>
+            <div class="sidebar authed" id="sidefollowers">
+                <h5>Followers</h5>
+                <ul>
+                    <div id="followers">
+                    </div>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="footerbg">
+        <div id="footerlinks"><a href="#" class="footerlinks">Home</a> | <a href="#" class="footerlinks">Register</a></div>
+    </div>
 </div>
 
 <div id="login_form" style='display:none'>
@@ -145,13 +146,13 @@
         <h1><img src="images/key.png" align="absmiddle">&nbsp;LOGIN</h1>
         <div id="login_response"><!-- spanner --></div>
         <form name="login" id="login" action="/auth/login" method="POST">
-        <input name="hash" type="hidden" value=""></input>
-        <label for="username">Username:</label><input type="text" name="username"/><br />
-        <label for="password">Password:</label><input type="password" name="password"/><br />
-        <input value="Login" name="Login" id="submit" type="submit" /><br />
-        <div id="ajax_loading">
-            <p><img align="absmiddle" src="images/spinner.gif" />&nbsp;Processing...</p>
-        </div>
+            <input name="hash" type="hidden" value=""></input>
+            <label for="username">Username:</label><input type="text" name="username"/><br />
+            <label for="password">Password:</label><input type="password" name="password"/><br />
+            <input value="Login" name="Login" id="submit" type="submit" /><br />
+            <div id="ajax_loading">
+                <p><img align="absmiddle" src="images/spinner.gif" />&nbsp;Processing...</p>
+            </div>
         </form>
     </center>
 </div>

@@ -1,254 +1,150 @@
 @charset "utf-8";
 /* CSS Document */
-body
-	{
-		margin:0px;
-		padding:0px;
-		background-image:url(images/bg.jpg);
-		background-repeat:repeat-x;
-		background-color:#bbcd72;
-	    font-family:Arial;
-	}
-#main
-	{
-		width:904px;
-		float:none;
-		margin:0 auto;
-		background-image:url(images/contenttxtbg.jpg);
-		background-repeat: repeat-y;
-	}
-#contenttxtblank
-	{
-		width:866px;
-		float: left;
-		margin:0px;
-		padding:0 0 40px 38px;
-		background-image:url(images/tempbg.jpg);
-		background-repeat:no-repeat;
-	}
-#menu
-	{
-		width:828px;
-		height:30px;
-		float: left;
-		margin:0px;
-		padding:0px;
-	}
-#menu ul
-	{
-		/*width:778px;*/
-		height:30px;
-		float: right;
-		margin:0px;
-		padding:0 0 0 50px;
-		display:block;
-	}
-#menu ul li
-	{
-		float: left;
-		margin:0px;
-		display:block;		
-		height:22px;
-		padding:5px 11px 0 11px;
-		font-family: "Trebuchet MS";
-		font-size:11px;
-	}
-#menu ul li a
-	{
-		font-weight:bold;
-		color:#000;
-		text-align:center;
-		text-decoration:none;
-		text-transform:uppercase;
-	}
-#menu ul li a:hover
-	{
-		font-weight:bold;
-		color:#444;
-		text-align:center;
-		text-decoration:none;
-		text-transform:uppercase;
-	}
-/*------------------------------------------------------MENU---------------------------------------------END--------------------------------------------------------------------------------*/	
-#contentleft
-	{
-		width:597px;
-		float:left;
-		margin:0px;
-		padding:5px 0 0 0;
-		font-size:12px;
-		line-height:20px;
-	}
-#logo
-	{
-		width:810px;
-		height:42px;
-		float:left;
-		margin:2px 0 0 0;
-		padding:4px 4px 4px 10px;
-		font-family:Arial;
-		font-size:38px;
-		color:#0f2a05;
-	    background-color:#cee181;
-		font-weight:normal;
-		color:#13819a;
-	}
-#logo-backup
-	{
-		width:810px;
-		height:42px;
-		float:left;
-		margin:15px 0 0 0;
-		padding:4px 0 0 10px;
-		font-family:Arial;
-		font-size:30px;
-		color:#13819a;
-        background-color: #eef8bc;
-		font-weight:normal;
-		color:#13819a;
-	}
-#lefttxtblank
-	{
-		padding:27px 0 0 20px;
-		width:509px;
-	}
-h1
-	{
-		font-size:18px;
-		color:#cf7d09;
-	}
-#lefttxt
-	{
-		float:left;
-		margin:0px;
-		padding:31px 0 0 0;
-		color:#4a513d;
-	}
-.leftboldtxt
-	{
-		font-family:Arial;
-		font-size:12px;
-		font-weight:bold;
-		color:#4a513d;
-	}
-.lefttxt
-	{
-		font-family:Arial;
-		font-size:12px;
-		color:#4a513d;
-		background-color:#cee181;
-	}
-.lefttxt02
-	{
-		font-family:Arial;
-		font-size:12px;
-		color:#4a513d;
-		background-color:#cee181;
-		padding:0 27px 0 3px;
-	}
-#buttonbg
-	{
-		width:501px;
-		height:25px;
-		float:left;
-		margin:10px 0 0 0;
-		padding:0px;
-		background-image:url(images/hline.jpg);
-		background-repeat:repeat-x;
-		background-position:center;
-	}
-.more
-	{
-		width:82px;
-		height:20px;
-		float: right;
-		margin:0px;
-		padding:5px 0 0 0;
-		font-family:"Trebuchet MS";
-		font-size:10px;
-		font-weight:bold;
-		color:#414141;
-		text-align:center;
-		text-decoration:none;
-		text-transform:uppercase;
-		background-image: url(images/morebutton.jpg);
-		background-repeat: no-repeat;
-	}
-.more:hover
-	{
-		width:82px;
-		height:20px;
-		float: right;
-		margin:0px;
-		padding:5px 0 0 0;
-		font-family:"Trebuchet MS";
-		font-size:10px;
-		font-weight:bold;
-		color:#414141;
-		text-align:center;
-		text-decoration:none;
-		text-transform:uppercase;		
-		background-image: url(images/morebutton.jpg);
-		background-repeat: no-repeat;
-	}	
+body {
+    margin:0px;
+    padding:0px;
+    background-image:url(images/bg.jpg);
+    background-repeat:repeat-x;
+    background-color:#bbcd72;
+    font-family:Arial;
+    font-size:12px;
+}
+#body {
+    width:904px;
+    float:none;
+    margin:0 auto;
+    background-image:url(images/contenttxtbg.jpg);
+    background-repeat: repeat-y;
+}
+#content {
+    width:866px;
+    float: left;
+    margin:0px;
+    padding:0 0 40px 38px;
+    background-image:url(images/tempbg.jpg);
+    background-repeat:no-repeat;
+}
+#main {
+    width:540px;
+    float:left;
+    /*padding:5px 0 0 0;*/
+    padding:5px;
+    line-height:20px;
+    margin:27px 5px 0 20px;
+    /*padding:27px 0 0 20px;*/
+    /*width:509px;*/
+}
+#sidebars {
+    width:229px;
+    float:right;
+    margin-right:20px;
+    padding:10px;
+}
+
+/* TOPBAR */
+#topbar {
+    width:828px;
+    height:30px;
+    float: left;
+    margin:0px;
+    padding:0px;
+}
+#topbar ul {
+    height:30px;
+    float: right;
+    margin:0px;
+    padding:0 0 0 50px;
+    display:block;
+}
+#topbar ul li {
+    float: left;
+    margin:0px;
+    display:block;		
+    height:22px;
+    padding:5px 11px 0 11px;
+    font-family: "Trebuchet MS";
+    font-size:11px;
+}
+#topbar ul li a {
+    font-weight:bold;
+    color:#000;
+    text-align:center;
+    text-decoration:none;
+    text-transform:uppercase;
+}
+#topbar ul li a:hover {
+    color:#444;
+}
+#header h1 {
+    width:810px;
+    height:42px;
+    float:left;
+    margin:2px 0 0 0;
+    padding:4px 4px 4px 10px;
+    font-size:38px;
+    color:#0f2a05;
+    background-color:#cee181;
+    font-weight:normal;
+}
+h1 {
+	font-size:18px;
+	color:#cf7d09;
+}
+#buttonbg {
+    width:501px;
+    height:25px;
+    float:left;
+    margin:10px 0 0 0;
+    padding:0px;
+    background-image:url(images/hline.jpg);
+    background-repeat:repeat-x;
+    background-position:center;
+}
 /*-----------------------------------------------------CONTENTLEFT-------------------------------------------------------------------------------------------------------------END----------*/	
-#contentright
-	{
-		width:229px;
-		float:left;
-		margin:0px;
-		padding:30px 0 0 0;
-	}
-#search
-	{
-		width:229px;
-		height:78px;
-		float:left;
-		margin:0px;
-		padding:0px;
-		background-image:url(images/search.jpg);
-		background-repeat:no-repeat;
-	}
-#searchblank
-	{
-		width:179px;
-		height:56px;
-		float:left;
-		margin:0px;
-		padding:22px 0 0 50px;
-	}
-#searchinput
-	{
-		width:103px;
-		height:22px;
-		float:left;
-		margin:0px;
-		padding:0px;
-	}
-.searchinput
-	{
-		width:97px;
-		height:18px;
-		float:left;
-		margin:0px;
-		padding:4px 0 0 6px;
-		font-family: Arial;
-		font-size:10px;
-		color:#070808;
-	}
+#search {
+    width:229px;
+    height:78px;
+    float:left;
+    padding:0px;
+    background-image:url(images/search.jpg);
+    background-repeat:no-repeat;
+	margin:15px 0 10px 0;
+}
+#searchblank {
+    width:179px;
+    height:56px;
+    float:left;
+    margin:0px;
+    padding:10px 0 0 50px;
+}
+#search h2 {
+    font-size: 13px;
+	font-weight:bold;
+    padding:0px;
+    margin:0px;
+}
+.searchinput {
+    width:97px;
+    height:18px;
+    float:left;
+    margin:5px 0 0 5px;
+    font-family: Arial;
+    font-size:10px;
+    color:#070808;
+}
 #searchbutton
+	{
+		/*width:51px;
+		height:21px;*/
+		float:left;
+        margin:5px 0 0 5px;
+		padding:0px;
+	}
+.button
 	{
 		width:51px;
 		height:21px;
-		float:left;
-		margin:1px 0 0 10px;
-		padding:0px;
-	}
-.search
-	{
-		width:51px;
-		height:18px;
-		float:left;
+		float:right;
 		margin:0px;
 		padding:3px 0 0 0;
 		font-family: Arial;
@@ -259,21 +155,15 @@ h1
 		background-image:url(images/searchbutton.jpg);
 		background-repeat:no-repeat;
 	}
-.search:hover
+.button:hover
 	{
-		width:51px;
-		height:18px;
-		float:left;
-		margin:0px;
-		padding:3px 0 0 0;
-		font-family: Arial;
-		font-size:10px;
-		color:#070808;
-		text-align:center;
-		text-decoration:none;
-		background-image:url(images/searchbutton.jpg);
-		background-repeat:no-repeat;
 	}
+#publish {
+    width:500px;
+    margin-left: auto ;
+    margin-right: auto ;
+
+}
 #advancesearch
 	{
 		width:103px;
@@ -436,6 +326,27 @@ h1
 		background-repeat:no-repeat;
 	}
 /*-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/		
+.sidebar
+	{
+		width:217px;
+		float:left;
+		margin:15px 0 10px 0;
+		padding:0px 0 34px 12px;
+		background-color:#c7da79;
+        background-image: url(images/morelinksheading.jpg);
+        background-repeat:no-repeat;
+	}
+.sidebar h5 {
+		width:177px;
+		height:31px;
+		float:left;
+		margin:0px;
+		padding:10px 0 8px 38px;
+		font-family:Arial;
+		font-size:18px;
+		font-weight:normal;
+		color:2a2a2a;
+}
 #morelinksheading
 	{
 		width:229px;
