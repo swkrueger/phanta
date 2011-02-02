@@ -8,9 +8,15 @@ function loadtimeline() {
         var timeline = $("div#timeline");
         timeline.html("");
         jQuery.each(msgs, function(i, msg) {
-            timeline.append("<div class=\"msg\"><span class=\"msgtext\">"+msg.username+": "+msg.message+"</span>");
-            if (msg.image) timeline.append("<span class=\"msgimg\"><img src=\"/upload/"+msg.image+"\"></span>");
-            timeline.append("</div");
+            var add = "";
+            if (msg.image) add += "<div class=\"msg\" style=\"min-height: 100px;\">";  // TODO: Change this hack into CSS
+            else add += "<div class=\"msg\">";
+            // TODO: Vertically align image in center
+            if (msg.image) add+="<span class=\"msgimg\"><img src=\"/upload/"+msg.image+"\" /></span>";
+            add += "<span class=\"msgtext\">"+msg.username+": "+msg.message+"</span>";
+            add += "</div";
+            timeline.append(add);
+            if (msg.image) 
             return true;
         });
         if (msgs.length==0) {
@@ -164,12 +170,18 @@ $(document).ready(function() {
             }
 
             var output = $('#profilesbox');
-            output.html("<ul class=\"profiles\">");
+            var html = "";
+            html += "<ul class=\"profiles\">";
             jQuery.each(profiles, function(i, profile) {
-                output.append("<li class=\"profile\" id=\""+profile.userids+"\">"+profile.username+"</li>");
+                html+="<li class=\"profile\" id=\""+profile.username+"\">"+profile.username+"</li>";
             });
-            output.append("</ul>");
+            html+="</ul>";
+            output.html(html);
             $('#profilesbox').modal();
+            $("ul.profiles li.profile").click(function(event) {
+                $("#profilesearch").val(event.target.id);
+                $.modal.close();
+            });
 
         });
     });

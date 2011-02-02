@@ -791,9 +791,18 @@ a#browseprofiles:hover {
     margin: 3px 0 0 10px;
 }
 
+.msgimg {
+    width: 100px;
+    height: 100px;
+    float: right;
+    text-align:center;
+    vertical-align:middle;
+    /*background-color: #dee8ac;*/
+}
 .msgimg img {
-    height: 120px;
-    display: inline;
+    max-height: 100px;
+    max-width: 100px;
+    /* TODO: Vertically align in center */
 }
 
 
@@ -841,7 +850,7 @@ ul.followlist {
 }
 li.follower {
     width: 200px;
-	background-color:#9b5b01;
+	background-color:#17501a;
     color: #fff;
 	/*background-color:#4a513d;*/
 	padding:2px;
@@ -849,17 +858,31 @@ li.follower {
 }
 span.unfollowbtn {
     float: right;
-	background-color:#4a513d;
+	background-color:#0c8c12;
     padding: 0 2px 0 2px;
     cursor: pointer;
     z-index: 100;
 }
+ul.profiles {
+    padding: 5px;
+    margin: 5px;
+    list-style-type:none;
+}
+li.profile {
+    width: 100%;
+    background-color: #eef8bc;
+    color: #000;
+	/*background-color:#4a513d;*/
+	padding:2px;
+    margin: 0 0 3px 0;
+    cursor: pointer;
+}
 
 /* Overlay */
-#simplemodal-overlay {background-color:#aaaaaa; cursor:wait;}
+#simplemodal-overlay {background-color:#aaaaaa; }
 
 /* Container */
-#simplemodal-container {height:300px; width:200px; background-color:#fff; border:1px solid #000000; -moz-border-radius: 5px; }
+#simplemodal-container {height:350px; width:250px; background-color:#bbcd72; border:1px solid #000000; -moz-border-radius: 5px; }
 #simplemodal-container a.modalCloseImg {background:url('../images/x.png') no-repeat; width:25px; height:29px; display:inline; z-index:3200; position:absolute; top:-15px; left:-18px; cursor:pointer;}
 #simplemodal-container #basicModalContent {padding:8px;}
 
