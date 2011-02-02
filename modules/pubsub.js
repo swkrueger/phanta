@@ -153,17 +153,16 @@ exports.GET = function(request, response) {
   var userid = request.session.data.authorized ? request.session.data.userid : 0;
   var client = request.redis();
   return client.lrange("userid:" + userid + ":timeline", 0, -1, function(error, messageids) {
-    if (error) return response.fin(500, error); 
+    if (error) return response.fin(500, error);
     if (!messageids.length) return response.fin(200, []);
     var q = messageids.map(function(messageid) { return "messageid:" + messageid + ":message"; });
     client.mget(q, function(error, messages) {
-      if (error) return response.fin(500, error); 
+      if (error) return response.fin(500, error);
       messages = messages.map(function(message) { return JSON.parse(message); }); // objects are stored stringified
       return response.fin(200, messages);
     });
   });
 };
-exports.GET.authReq = true;
 
 
 // subscribers -> POST /pubsub { channel|channelid : <channel|channelid> } -> ?

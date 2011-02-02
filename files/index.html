@@ -1,84 +1,14 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Phanta</title>
-<link href="/css/style.css" rel="stylesheet" type="text/css" />
-<link type='text/css' href='css/loginbox.css' rel='stylesheet' media='screen' />
-<link rel="icon" href="/css/images/icon.ico" />
-<script type="text/javascript" src="/js/jquery.js"></script>
-<script type="text/javascript" src="/js/villagebus.js"></script>
-<script type="text/javascript" src="/js/sha1-min.js"></script>
-<script type="text/javascript" src="/js/loginbox.js"></script>
-<script type="text/javascript" src="/js/jquery.simplemodal.1.4.1.min.js"></script>
-<script type="text/javascript">
-    function loadtimeline() {
-        villagebus.GET("/pubsub",function(error,msgs){
-            if (error){
-                // TODO: Show error message
-                return false;
-            }
-
-            var timeline = $("div#timeline");
-            jQuery.each(msgs, function(i, msg) {
-                timeline.append("<div class=\"msg\">"+msg.username+": "+msg.message+"</div");
-                return true;
-            });
-            // TODO: Show "no messages"
-        });
-
-    }
-    function populate_profile() {
-        villagebus.GET("/profiles",function(error,profile){
-            console.log(profile.username);
-            var following = $("div#following");
-            following.html("");
-            jQuery.each(profile.following, function(i, follower) {
-                following.append("<li class=\"follower\">"+follower.username+"</li>");
-                return true;
-            });
-            if (following.html()=="") following.html("<li>You are not following any people</li>");
-            var followers = $("div#followers");
-            followers.html("");
-            jQuery.each(profile.followers, function(i, follower) {
-                followers.append("<li class=\"follower\">"+follower.username+"</li>");
-                return true;
-            });
-            if (followers.html()=="") followers.html("<li>No people are following you</li>");
-        });
-
-    }
-    function checklogin() {
-        console.log("I'm here");
-        villagebus.GET("/auth/session", function(error, session) {
-          if (error) {
-            return $("#auth-status").html("Error while getting auth status");
-          }
-          console.log("Test:" + session.authorized);
-          if (session.authorized) {
-            $("#auth-status").html("Logged in as "+session.username);
-            $("div#timeline").html("");
-            $(".notauthed").hide();
-            $(".authed").show();
-            populate_profile();
-          } else {
-            $("#auth-status").html("Not logged in");
-            $(".authed").hide();
-            $(".notauthed").show();
-          }
-        });
-        loadtimeline();
-    }
-    $(document).ready(function() {
-        checklogin();
-        $("#logoffbtn").click(function() {
-            villagebus.GET("/auth/logoff", function(error, response) {
-                checklogin();
-            });
-            return false;
-        });
-    });
-</script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Phanta</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+    <link rel="icon" href="/css/images/icon.ico" />
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/villagebus.js"></script>
+    <script type="text/javascript" src="/js/sha1-min.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
 </head>
 
 <body>
@@ -112,26 +42,33 @@
         <div id="sidebars">
             <div class="sidebar notauthed" id="sidelogin">
                 <h5>Login</h5>
+                <div id="login_response"><!-- spanner --></div>
+                <form name="login" id="login" action="/auth/login" method="POST">
+                    <input name="hash" type="hidden" value=""></input>
+                    <label for="username">Username:</label><input type="text" name="username" class="textbox" placeholder="Enter username"/><br />
+                    <label for="password">Password:</label><input type="password" name="password" class="textbox" placeholder="Enter password"/><br />
+                    <center><input value="Login" name="Login" id="submit" type="submit" class="button" /></center>
+                    <div id="ajax_loading">
+                        <p><img align="absmiddle" src="images/spinner.gif" />&nbsp;Processing...</p>
+                    </div>
+                </form>
             </div>
             <div id="search" class="authed">
                 <div id="searchblank">
                     <h2>Follow someone</h2>
                     <input name="textfield" type="text" class="searchinput" id="textfield" placeholder="Enter username" />
                     <div id="searchbutton"><a href="#" class="button">Add</a></div>
+                    <p>Browse users</p>
                 </div>
             </div>
             <div class="sidebar authed" id="sidefollowing">
                 <h5>Following</h5>
-                <ul>
-                    <div id="following">
-                    </div>
+                <ul class="followlist" id="following">
                 </ul>
             </div>
             <div class="sidebar authed" id="sidefollowers">
                 <h5>Followers</h5>
-                <ul>
-                    <div id="followers">
-                    </div>
+                <ul class="followlist" id="followers">
                 </ul>
             </div>
         </div>
@@ -140,26 +77,6 @@
         <div id="footerlinks"><a href="#" class="footerlinks">Home</a> | <a href="#" class="footerlinks">Register</a></div>
     </div>
 </div>
-
-<div id="login_form" style='display:none'>
-    <center>
-        <h1><img src="images/key.png" align="absmiddle">&nbsp;LOGIN</h1>
-        <div id="login_response"><!-- spanner --></div>
-        <form name="login" id="login" action="/auth/login" method="POST">
-            <input name="hash" type="hidden" value=""></input>
-            <label for="username">Username:</label><input type="text" name="username"/><br />
-            <label for="password">Password:</label><input type="password" name="password"/><br />
-            <input value="Login" name="Login" id="submit" type="submit" /><br />
-            <div id="ajax_loading">
-                <p><img align="absmiddle" src="images/spinner.gif" />&nbsp;Processing...</p>
-            </div>
-        </form>
-    </center>
-</div>
-
-</div>
-
-
 
 </body>
 </html>

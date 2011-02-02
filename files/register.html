@@ -1,57 +1,74 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Register new user</title>
-<link href="/css/forms.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="/js/jquery.js"></script>
-<script type="text/javascript" src="/js/sha1-min.js"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Phanta: Registration</title>
+    <link href="/css/style.css" rel="stylesheet" type="text/css" />
+    <link rel="icon" href="/css/images/icon.ico" />
+    <script type="text/javascript" src="/js/jquery.js"></script>
+    <script type="text/javascript" src="/js/villagebus.js"></script>
+    <script type="text/javascript" src="/js/sha1-min.js"></script>
 <script type="text/javascript">
-
-$(document).ready(function(){
-    $("form[name=register]").submit(function(event){       
-	if (event.target.email.value==''&& event.target.cellphone.value=='') {
-            $("span").text("Please type your e-mail address and or cellphone").show().fadeOut(10000);
-	    return false;
-	}
-	if (event.target.password1.value==event.target.password2.value) {
-	    var user;
-	    if (event.target.email.value!="") user=event.target.email.value;
-	    else user=event.target.cellphone.value;
-	    var hash=hex_sha1(user + event.target.password1.value);
-	    event.target.password1.value="";
-	    event.target.password2.value="";
-	    event.target.hash.value=hash;
-	    return true;
-	} else {
-      	    $("span").text("Passwords do not Match").show().fadeOut(10000);
-	    return false;
-        }
+    $(document).ready(function(){
+        $("form[name=register]").submit(function(event){       
+            if (event.target.email.value=='' && event.target.cellphone.value=='') {
+                $("span#response").text("Please type your e-mail address and/or cellphone number").show().fadeOut(10000);
+                return false;
+            }
+            if (event.target.password1.value==event.target.password2.value) {
+                var user;
+                if (event.target.email.value!="") user=event.target.email.value;
+                else user=event.target.cellphone.value;
+                var hash=hex_sha1(user + event.target.password1.value);
+                event.target.password1.value="";
+                event.target.password2.value="";
+                event.target.hash.value=hash;
+                return true;
+            } else {
+                $("span#response").text("Passwords do not match").show().fadeOut(10000);
+                return false;
+            }
+        });
     });
-});
 </script>
 </head>
-<body>
-<center>
-<fieldset>
-<legend>User Registration Form</legend>
-<h1><i>Phanta.org</i></h1>
-<form name="register" action="/auth/register" method="POST">
-<p><label for="email">E-mail:</label><input type="email" name="email" placeholder="Type your email here" required/></p>
-<p> <h6>Example:user@phanta.oorg</h6></p>
-<h4>OR</h4>
-<p><label for="cellphone">Cellphone:</label><input type="text" name="cellphone" placeholder="eg +27 709 0000 000"/><br/></p>
 
-<p> <h6>Please Use International format only : eg  +27 76... </h6></p>
+<body>
+<div id="body">
+    <div id="content">
+        <div id="topbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+            </ul>
+        </div>
+        <div id="header">
+            <h1>Phanta Registration</h1>
+        </div>
+        <div id="main-onecol">
+<form name="register" id="register" action="/auth/register" method="POST">
+<span style="color:red" id="response"></span>
+<p><label for="email">E-mail:</label><input type="email" name="email" placeholder="Type your email here" required/></p>
+<p><i>Example: user@phanta.org</i></p>
+<h4>AND / OR</h4>
+<p><label for="cellphone">Cellphone:</label><input type="text" name="cellphone" placeholder="eg +27 709 0000 000"/><br/></p>
+<!--<p><i>Please use international format only : eg  +2712 76... </i></p>-->
 <p><label for="password1">Password:</label><input type="password" name="password1"  placeholder="Create own password" required/><br></p>
 <p><label for="password2">Confirm Password:</label><input type=password name="password2"   placeholder="Re-enter your password" required/><br/></p>
-<span style="color:red"></span>
 <input name="hash" type="hidden" value=""></input>
-<p> <h6>Please note, the password must be at least 6 characters.</h6></p>
+<!--<p><i>Please note, the password must be at least 6 characters.</i></p>-->
 
 <p  class="submit"><input type="submit" value="Submit"  class="submit"><input type="reset" value="Reset"/></p>
 
-</fieldset>
-</center>
 </form>
+        </div>
+    </div>
+    <div id="footerbg">
+        <div id="footerlinks"><a href="#" class="footerlinks">Home</a></div>
+    </div>
+</div>
 
 </body>
 </html>
+
+
+

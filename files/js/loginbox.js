@@ -7,7 +7,7 @@ $(document).ready(function(){
         return false;
     });
 
-    // When the form is submitted
+    // When the login form is submitted
     $("form[name=login]").submit(function(event) {
         var login_fail = function(message) {
             if (message=="unauthorized") message = "Incorrect username or password";

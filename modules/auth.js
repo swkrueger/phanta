@@ -103,7 +103,12 @@ auth.register.POST = function(req, res) {
                 },
                 function showPage(err) {
                     if (err) return mkError(500, "Database error")(req, res);
-                    res.simpleJSON(201, { ok: "User created" });
+                    //res.simpleJSON(201, { ok: "User created" });
+                    req.session.data.username = username;
+                    req.session.data.authorized = true;
+                    req.session.data.userid = userid;
+                    res._headers['Location'] = '/';
+                    res.writeHTML(302, '<h1>User created. Redirecting...</h1>');
                     console.log("Registered user '"+username+"' with USERID "+userid);
                     // TODO: automatically login when finished registering
                 });
