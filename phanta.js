@@ -20,6 +20,7 @@ var sys=require('sys'),
     qs=require('querystring'),
     fs=require('fs'),
     path=require('path'),
+    multipart=require('multipart'),
     opts = require('opts'),
     util=require('./util');
 
@@ -111,14 +112,36 @@ not_found = function(req, res) {
 POST_handler = function(req, callback)
 {
     if (req.method == 'POST') {
+        req.setEncoding("binary"); // otherwise multipart gets nuked
         req.data = {};
         var _CONTENT = '';
         // Load chucks of POST data
         req.addListener('data', function(chunk) {
             _CONTENT+=chunk;
         });
-        // Parse data as JSON or QueryString and load into request object 
+        // Parse data as multipart, JSON or QueryString and load into request object 
         req.addListener('end', function() {
+            if (req.data && req.data.substring(0, 4) == "----") {
+                var data = {};
+                var parser = multipart.parser();
+                var fields = {};
+                var files  = {};
+                var buffer = "";
+                parser.headers = req.headers;
+                parser.onpartend = function (part)  {  
+                    if (part.filename) files [part.filename] = buffer; 
+                    else               fields[part.name] = buffer; 
+                    buffer = "";
+                };
+                parser.ondata = function (chunk) { buffer += chunk; };
+                parser.onend = function () { 
+                    req.data  = fields;
+                    req.files = files;
+                };
+                parser.write(req.data);
+                parser.close();
+                return;
+            }
             try {
                 req.data = JSON.parse(_CONTENT);
                 return callback();

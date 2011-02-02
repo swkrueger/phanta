@@ -1,6 +1,7 @@
 
 var http  = require("http");
 var redis = require("redis");
+var fs    = require("fs");
 var fail  = require("../common").fail;
 
 console.log("loaded module: pubsub");
@@ -97,13 +98,21 @@ exports.POST = function(request, response) {
   if (!request.session.data.authorized) return response.fin(401, "not logged in");
   if (!request.data || !request.data.message) return response.fin(400, "invalid message");
   var client = request.redis();
-  var message = {
-    message   : request.data.message,
-    timestamp : (new Date()).valueOf(),
-    userid    : request.session.data.userid,
-    username  : request.session.data.username,
-    channel   : request.session.data.username   // no channel specified - use username as the channel name
-  };
+  var message = request.data ? request.data : {};
+  message.timestamp = (new Date()).valueOf();
+  message.userid    = request.session.data.userid;
+  message.username  = request.session.data.username;
+  message.channel   = request.session.data.username;   // no channel specified - use username as the channel name
+  
+  if (request.files && Object.keys(request.files)[0]) { // message has a file attached, include it
+    filename = Object.keys(request.files)[0];
+    message.image = filename; // TODO should only be set after save
+    fs.writeFile("webroot/uploads/" + filename, 
+                 request.files[filename], "binary", function(error) { // TODO: store data in redis, not local filesystem
+      if (error) console.log("ERROR SAVING FILE: " + error);
+      console.log("saved: " + filename);
+    }); 
+  }
 
   return client.get("channel:" + request.session.data.username + ":channelid", function(error, channelid) {
     if (error) return response.fin(500, error);
@@ -136,13 +145,12 @@ exports.POST = function(request, response) {
           multi.exec(function(error, reply) {
             if (error || !reply) return response.fin(500, error ? error : "null replies on message post");
             response.fin(302, messageid, { // redirect
-              'Location' : '/'
+              'Location' : '/villagebus.tests.html'
             });
           });
         });    
   };
 };
-exports.POST.authReq = true;
 
 
 // poll -> GET /pubsub?[channel|lastn|daterange] -> <messages>
@@ -153,11 +161,11 @@ exports.GET = function(request, response) {
   var userid = request.session.data.authorized ? request.session.data.userid : 0;
   var client = request.redis();
   return client.lrange("userid:" + userid + ":timeline", 0, -1, function(error, messageids) {
-    if (error) return response.fin(500, error);
+    if (error) return response.fin(500, error); 
     if (!messageids.length) return response.fin(200, []);
     var q = messageids.map(function(messageid) { return "messageid:" + messageid + ":message"; });
     client.mget(q, function(error, messages) {
-      if (error) return response.fin(500, error);
+      if (error) return response.fin(500, error); 
       messages = messages.map(function(message) { return JSON.parse(message); }); // objects are stored stringified
       return response.fin(200, messages);
     });
