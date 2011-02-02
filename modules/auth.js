@@ -29,10 +29,10 @@ auth.login.POST = function(req, res) {
     console.log(hashreq);
     if (username=="" || username===undefined) return mkError(400, 'No username specified')(req, res);
     if (hashreq=="" || hashreq===undefined) return mkError(400, 'No hash specified')(req, res);
-    if  (req.session.data.user!="Guest") {
+    /*if  (req.session.data.user!="Guest") {
 		  res._headers['Location'] = '/';
       return res.writeHTML(302, '<h1>Already logged in. Redirecting...</h1>');
-	}
+	}*/
     // Get USERID from database
     rclient.get("username:"+username+":userid", function(err, userid) {
         if (err) return mkError(500, "Database error")(req, res);
@@ -51,9 +51,10 @@ auth.login.POST = function(req, res) {
                 console.log("User '"+username+"' has sucessfully logged in");
                 req.session.data.username = username;
                 req.session.data.authorized = true;
-                res._headers['Location'] = '/';
+                //if (req.params.redirect===undefined || req.params.redirect==true) res._headers['Location'] = '/';  // FIXME
+                res.simpleJSON(302, { ok: "logged in" });
                 //res.writeText(302, 'Sucessfully logged in. Redirecting...');
-                res.writeHTML(302, '<h1>Redirecting...</h1>');
+                //res.writeHTML(302, '<h1>Redirecting...</h1>');
             } else {  // No
                 console.log("Login failed for user '"+username+"': Incorrect password");
                 return auth.unauthorized(req, res);
@@ -108,12 +109,13 @@ auth.register.POST = function(req, res) {
                 });
         });
     });
-
 }
 
 auth.logoff = { };
 auth.logoff.GET = function(req, res) {
     req.session.data.username = "Guest";
+    req.session.data.userid = 0;
+    req.session.data.authorized = false;
 	res.simpleJSON(200, {
         ok: "logged off"
 	});

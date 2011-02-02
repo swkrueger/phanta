@@ -1,10 +1,121 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Welcome!</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Phanta</title>
+<link href="/css/style.css" rel="stylesheet" type="text/css" />
+<link type='text/css' href='css/loginbox.css' rel='stylesheet' media='screen' />
+<link rel="icon" href="/css/images/icon.ico" />
+<script type="text/javascript" src="/js/jquery.js"></script>
+<script type="text/javascript" src="/js/villagebus.js"></script>
+<script type="text/javascript" src="/js/sha1-min.js"></script>
+<script type="text/javascript" src="/js/loginbox.js"></script>
+<script type="text/javascript" src="/js/jquery.simplemodal.1.4.1.min.js"></script>
+<script type="text/javascript">
+    function checklogin() {
+        console.log("I'm here");
+        villagebus.GET("/auth/session", function(error, session) {
+          if (error) {
+            return $("#auth-status").html("Error while getting auth status");
+          }
+          console.log("Test:" + session.authorized);
+          if (session.authorized) {
+            $("#auth-status").html("Logged in as "+session.username);
+            $("#auth-register").hide();
+            $("#auth-login").hide();
+            $("#auth-logoff").show();
+          } else {
+            $("#auth-status").html("Not logged in");
+            $("#auth-register").show();
+            $("#auth-login").show();
+            $("#auth-logoff").hide();
+          }
+        });
+
+    }
+    $(document).ready(function() {
+        checklogin();
+        $("#logoffbtn").click(function() {
+            villagebus.GET("/auth/logoff", function(error, response) {
+                checklogin();
+            });
+            return false;
+        });
+    });
+</script>
 </head>
+
 <body>
-<h1>Welcome!</h1>
-<p><a href="/login.html">Click here to login</a></p>
-<p><a href="/register.html">Click here to register</a></p>
+<div id="main">
+    <div id="contenttxtblank">
+      <div id="menu">
+        <ul>
+          <li id="auth-status">You are not logged in</li>
+          <li id="auth-login"><a href="/login.html" id="loginbtn">Login</a></li>
+          <li id="auth-logoff"><a href="/auth/logoff" id="logoffbtn">Logoff</a></li>
+          <li id="auth-register"><a href="/register.html">Register</a></li>
+        </ul>
+      </div>
+      <h2 id="logo">Phanta</h2>
+      <div id="contentleft"><div id="lefttxtblank">
+        <h1>The timeline</h1>
+        <div id="timeline">
+            <div class="msg">Testo</div>
+        </div>
+
+      </div></div>
+      <div id="contentright">
+        <div id="search">
+          <div id="searchblank">
+            <div id="searchinput">
+              <label>
+                <input name="textfield" type="text" class="searchinput" id="textfield" value="Enter Keyword" />
+              </label>
+            </div>
+            <div id="searchbutton"><a href="#" class="search">Search</a></div>
+            <div id="advancesearch"><a href="#" class="advancesearch">Advance Search</a></div>
+          </div>
+        </div>
+        <div id="morelinksheading">
+          <h5>Following</h5>
+        </div>
+        <div id="morelinks">
+          <div class="date">12.01.08</div>
+          <div class="linkblank"><a href="#" class="link">Scelerisque amassa suspendisse</a></div>
+        </div>
+        <div id="morelinksheading">
+          <h5>Followers</h5>
+        </div>
+        <div id="morelinks">
+          <div class="date">12.01.08</div>
+          <div class="linkblank"><a href="#" class="link">Scelerisque amassa suspendisse</a></div>
+        </div>
+      </div>
+  </div>
+  <div id="footerbg">
+    <div id="footerlinks"><a href="#" class="footerlinks">Home</a> | <a href="#" class="footerlinks">Register</a></div>
+  </div>
+</div>
+
+<div id="login_form" style='display:none'>
+    <center>
+        <h1><img src="images/key.png" align="absmiddle">&nbsp;LOGIN</h1>
+        <div id="login_response"><!-- spanner --></div>
+        <form name="login" id="login" action="/auth/login" method="POST">
+        <input name="hash" type="hidden" value=""></input>
+        <label for="username">Username:</label><input type="text" name="username"/><br />
+        <label for="password">Password:</label><input type="password" name="password"/><br />
+        <input value="Login" name="Login" id="submit" type="submit" /><br />
+        <div id="ajax_loading">
+            <p><img align="absmiddle" src="images/spinner.gif" />&nbsp;Processing...</p>
+        </div>
+        </form>
+    </center>
+</div>
+
+</div>
+
+
+
 </body>
 </html>
