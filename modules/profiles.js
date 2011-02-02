@@ -69,6 +69,24 @@ profiles.GET = function(req, res) {
 
 }
 
+
+// profiles -> PUT /profiles {} 
+//             Update the profile of the currently logged in user
+// ccurl -X PUT -d '{"userid":1,"username":"antoine@7degrees.co.za","longitude":0.0,"latitude":0.0}' "http://127.0.0.1:8000/profiles"
+exports.PUT = function(request, response) {
+  if (!request.session.data.authorized) return response.fin(401, "not logged in");
+  if (!request.data.userid || !request.data.username ||
+      request.session.data.userid   != request.data.userid ||
+      request.session.data.username != request.data.username) return response.fin(400, "invalid request");
+  var client = request.redis();
+  client.set("userid:" + request.session.data.userid + ":profile",
+             JSON.stringify(request.data), function(error, userid) {
+               if (error) return response.fin(500, error);
+               return response.fin(200, request.data);
+             });
+};
+
+
 profiles.search ={ };
 profiles.search.GET = function(req, res) {
     var q = req.params.q;
