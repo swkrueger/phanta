@@ -88,6 +88,7 @@ auth.register.POST = function(req, res) {
             if (err || userid===null) return mkError(500, "Database error")(req, res);
             var profile = { userid : userid,
                             username : username };
+            //if (req.session.data.cellhandler) profile['cellhandler'] = req.sesion.data.cellhandler;
             Step(function storeValues() {
                     // Store values in database
                     rclient.multi()
@@ -95,8 +96,8 @@ auth.register.POST = function(req, res) {
                                 "userid:"+userid+ ":profile",  JSON.stringify(profile),
                                 "userid:"+userid+":username", username,
                                 "userid:"+userid+":hash", req.data.hash,
-                                "userid:"+userid+":email", req.data.email,
-                                "userid:"+userid+":cellphone", req.data.cellphone ])
+                                "userid:"+userid+":email", req.data.email||"",
+                                "userid:"+userid+":cellphone", req.data.cellphone||"" ])
                         .zadd("usernames:username", 0, username)
                         .zadd("usernames:userid", 0, userid)
                         .exec(this.parallel());
@@ -145,8 +146,21 @@ auth.checkSession = function(req, res, handler) {
     // refresh expire
     //console.log();
     session(req, res, function(req, res) {
-        if (req.session.data.username=="Guest" && handler.authReq===true) auth.unauthorized(req, res);
-        handler(req, res);
+        if (req.params.smsnr) {
+            smsnr = req.params.smsnr;
+            console.log("Overwrite session username as "+smsnr);
+            rclient.get("username:"+smsnr+":userid", function(err, userid) {
+                if (err) return mkError(500, "Database error")(req, res);
+                req.session.data.username=smsnr;
+                req.session.data.userid=userid;
+                req.session.data.authorized=true;
+                req.session.data.cellhandler=smsnr;
+                return handler(req, res);
+            });
+        } else {
+            if (req.session.data.username=="Guest" && handler.authReq===true) auth.unauthorized(req, res);
+            handler(req, res);
+        }
     });
 }
 

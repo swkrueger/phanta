@@ -137,15 +137,30 @@ exports.POST = function(request, response) {
           var multi = client.multi()
               .set("messageid:" + messageid + ":message", JSON.stringify(message))
               .zadd("channelid:" + channelid + ":timeline", (new Date()).valueOf(), messageid)
-              .lpush("userid:" + request.session.data.userid + ":timeline", messageid)
+              //.lpush("userid:" + request.session.data.userid + ":timeline", messageid)
               .lpush("userid:0:timeline", messageid); // global timeline
           for (var i in subscribers) {
             multi.lpush("userid:" + subscribers[i] + ":timeline", messageid);
           }
           multi.exec(function(error, reply) {
+            var multi = client.multi()
             if (error || !reply) return response.fin(500, error ? error : "null replies on message post");
-            response.fin(302, messageid, { // redirect
-              'Location' : '/'
+            for (var i in subscribers) {
+                multi.mget(["userid:" + subscribers[i] + ":cellphone", "userid:" + subscribers[i] + ":email"]);
+            }
+            multi.exec(function(error, reply) {
+                if (error || !reply) return response.fin(500, error ? error : "null replies on message post");
+                var sms=require('./sms');
+                for (var i in reply) {
+                    cellphone=reply[i][0];
+                    email=reply[i][1];
+                    if (cellphone!="" && email=="") {
+                        sms.send(cellphone, "New message from "+channelid+": "+message.message);
+                    }
+                }
+                response.fin(302, messageid, { // redirect
+                    'Location' : '/'
+                });
             });
           });
         });    
@@ -189,6 +204,7 @@ exports.subscribers = {
         if (error) return response.fin(500, error);
         if (!channelid) { // create channel from channelname
           return channel_create(client, null, request.data.channel, function(error, channelid) {
+              console.log("Creating channel "+channelid);
             if (error) return response.fin(500, error);
             subscribe(channelid);
           });

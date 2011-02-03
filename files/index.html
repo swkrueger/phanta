@@ -33,7 +33,6 @@
             <div id="publish" class="authed">
                 <h1>Post a message</h1>
                 <form name="publish" action="/pubsub/publish" method="POST" enctype="multipart/form-data">
-                    <input type="hidden" name="dummy" value="foobar" />
                     <textarea name="message" rows="3" cols="68" placeholder="Write something here"></textarea><br />
                     Upload photo (optional):<input type="file" name="image" size="20" accept="image/jpeg">
                     <input value="Post" class="button" name="post" id="post" type="submit" /><br />

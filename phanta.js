@@ -162,7 +162,7 @@ POST_handler = function(req, callback)
 load_file = function(filename) {
     // TODO: Update file handler!!!
 	var body;
-    sys.debug("-- Enter load_file function");
+    //sys.debug("-- Enter load_file function");
     if (filename.charAt(filename.length-1)=="/") filename+=GLOBALS['DIRECTORY_INDEX'];
 
 	function loadResponseData(callback) {
@@ -201,7 +201,7 @@ dispatch_module = function(req) {
     // TODO: output debug info
     var module = modules[req.path[0]];
     if (!module) {
-        sys.debug("Module '"+modname+ "' does not exist");
+        //sys.debug("Module '"+req.path[0]+ "' does not exist");
         return false;
     }
     console.log(".. dispatch to module "+req.path[0]);

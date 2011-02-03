@@ -1,0 +1,12 @@
+From: 27764574638
+From_TOA: 91 international, ISDN/telephone
+From_SMSC: 2782913594
+Sent: 09-11-29 10:36:05
+Received: 09-11-29 17:18:40
+Subject: GSM1
+IMSI: 655015664004985
+Report: no
+Alphabet: ISO
+
+follow swk@swk.za.net
+
