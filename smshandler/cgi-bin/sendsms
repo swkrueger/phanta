@@ -19,4 +19,4 @@ echo "Status: 200 OK"
 echo ""
 echo "Content-type: text/plain\n"
 echo ""
-./sendsms $CELLNR $MESSAGE
+/opt/phanta/sendsms $CELLNR "$MESSAGE"
