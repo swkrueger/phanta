@@ -52,8 +52,8 @@ echo "" >> $FILE
 echo -n "$TEXT" >> $FILE
 
 chmod 777 $FILE
-echo "======"  >>/opt/phanta/sms.log 2>>/opt/phanta/sms.err
+echo -e "\n======"  >>/opt/phanta/sms.log 2>>/opt/phanta/sms.err
 cat $FILE  >>/opt/phanta/sms.log 2>>/opt/phanta/sms.err
-echo "======"  >>/opt/phanta/sms.log 2>>/opt/phanta/sms.err
+echo -e "\n======\n"  >>/opt/phanta/sms.log 2>>/opt/phanta/sms.err
 mv $FILE /var/spool/sms/outgoing/
 
