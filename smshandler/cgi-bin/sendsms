@@ -1,22 +1,23 @@
 #!/bin/bash
 
-
-CELLNR=`echo "$QUERY_STRING" | sed -n 's/^.*cellnr=\([^&]*\).*$/\1/p' | sed "s/%20/ /g"`
 MESSAGE=$(</dev/stdin)
+CELLNR=`echo "$QUERY_STRING" | sed -n 's/^.*cellnr=\([^&]*\).*$/\1/p' | sed "s/%20/ /g"`
 
 if [ $CELLNR ] && [ $MESSAGE ]
 then
-    
+    echo foo > /dev/null
 else
     echo "Status: 400 Bad Request"
     echo ""
-    echo "Content-type: text/plain\n"
+    echo "Content-type: text/plain"
     echo ""
     echo "Please specify message and cellphone number"
 fi
 
 echo "Status: 200 OK"
 echo ""
-echo "Content-type: text/plain\n"
+echo "Content-type: text/plain"
 echo ""
+echo "To: $CELLNR"
+echo "Message: $MESSAGE"
 /opt/phanta/sendsms $CELLNR "$MESSAGE"

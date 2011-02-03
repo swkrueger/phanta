@@ -20,29 +20,29 @@ if [ -z "$TEXT" ]; then
     read TEXT
 fi
 
-prefix1=${DEST:0:3}
-prefix2=${DEST:0:4}
+#prefix1=${DEST:0:3}
+#prefix2=${DEST:0:4}
+#
+#vodasend() {
+#    echo "Sending through vodacom.co.za"
+#    python ~tiger/vodacom-wc.py $DEST "$TEXT"
+#    exit 0;
+#}
+#
+#case "$prefix1" in
+#    076|082|071) 
+#        vodasend
+#        ;;
+#    *) ;;
+#esac
+#case "$prefix2" in
+#    2776|2782|2771)
+#        vodasend
+#        ;;
+#    *) ;;
+#esac
 
-vodasend() {
-    echo "Sending through vodacom.co.za"
-    ~tiger/vodacom-wc.py $DEST "$TEXT"
-    exit 0;
-}
-
-case "$prefix1" in
-    076|082|071) 
-        vodasend
-        ;;
-    *) ;;
-esac
-case "$prefix2" in
-    2776|2782|2771)
-        vodasend
-        ;;
-    *) ;;
-esac
-
-echo "Sending through GSM modem"
+echo "Sending SMS through GSM modem:" >>/opt/phanta/sms.log 2>>/opt/phanta/sms.err
 
 #FILE=`mktemp /backup/Server/Sharings/sms/outgoing/send_XXXXXX`
 FILE=`mktemp /tmp/send_XXXXXX`
@@ -52,5 +52,8 @@ echo "" >> $FILE
 echo -n "$TEXT" >> $FILE
 
 chmod 777 $FILE
-#mv FILE /var/spool/sms/outgoing/
+echo "======"  >>/opt/phanta/sms.log 2>>/opt/phanta/sms.err
+cat $FILE  >>/opt/phanta/sms.log 2>>/opt/phanta/sms.err
+echo "======"  >>/opt/phanta/sms.log 2>>/opt/phanta/sms.err
+mv $FILE /var/spool/sms/outgoing/
 

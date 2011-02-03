@@ -109,7 +109,7 @@ def main():
     elif (cmd=="follow" or cmd=="f"):
         profiles_follow(cellnr, params.pop(0).lower())
     elif (cmd=="unfollow" or cmd =="u"):
-        profiles_follow(cellnr, params.pop(0).lower())
+        profiles_unfollow(cellnr, params.pop(0).lower())
     else:
         #sendsms(cellnr, "Unknown command")
         pass
