@@ -3,6 +3,7 @@ var http  = require("http");
 var redis = require("redis");
 var fs    = require("fs");
 var fail  = require("../common").fail;
+var sms=require('./sms');
 
 console.log("loaded module: pubsub");
 
@@ -150,12 +151,12 @@ exports.POST = function(request, response) {
             }
             multi.exec(function(error, reply) {
                 if (error || !reply) return response.fin(500, error ? error : "null replies on message post");
-                var sms=require('./sms');
                 for (var i in reply) {
                     cellphone=reply[i][0];
                     email=reply[i][1];
+                    console.log("-- "+cellphone+" "+email);
                     if (cellphone!="" && email=="") {
-                        sms.send(cellphone, "New message from "+channelid+": "+message.message);
+                        sms.send(cellphone, "New message from "+message.username+": "+message.message);
                     }
                 }
                 response.fin(302, messageid, { // redirect
