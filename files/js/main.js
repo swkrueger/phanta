@@ -192,7 +192,7 @@ $(document).ready(function() {
    villagebus.GET("/profiles",function(error,profile){
            console.log(profile);
 	   $("input[name=userid]").val(profile.userid);
-           $("input[name=username]").val(profile.username);
+     $("input[name=username]").val(profile.username);
            if (profile.name) $("input[name=name]").val(profile.name);
            if (profile.surname) $("input[name=surname]").val(profile.surname);
            if (profile.longitude) $("input[name=longitude]").val(profile.longitude);
@@ -232,8 +232,8 @@ function success(position) {
   });
   google.maps.event.addListener(marker, 'mouseup', function() {
     console.log(marker.position);
-    $("input[name=longitude]").val(marker.position.xa);
-    $("input[name=latitude]").val(marker.position.za);
+    $("#longitude").val(marker.position.xa ? marker.position.xa : marker.position.wa);
+    $("#latitude").val(marker.position.za  ? marker.position.za : marker.position.ya);
   });
 
 }
