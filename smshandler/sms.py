@@ -17,65 +17,9 @@ from sys import argv, stderr, exit
 LOGIN_URL = "https://www.vodacom.co.za/portal/site/myaccount/template.VCOMLOGIN/"
 SMS_URL   = "https://www.vodacom.co.za/portal/site/myaccount/sms/"
 
-#PHANTA_HOST = "10.8.0.6"
-#PHANTA_PORT = "80"
-PHANTA_HOST = "127.0.0.1"
-PHANTA_PORT = "8080"
+PHANTA_HOST = "10.8.0.6"
+PHANTA_PORT = "80"
 PHANTA_URL = "http://"+PHANTA_HOST+":"+PHANTA_PORT
-
-def send_sms_voda(user, pword, number, txt):
-    if user[0] == '0':
-        user = '27' + user[1:]
-
-    br = Browser()
-    br.set_proxies({"http": "pta-proxy.csir.co.za:3128",
-                })
-
-
-    # Set user-agent
-    headers = dict(br.addheaders)
-    headers["User-agent"] = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9) Gecko/2008052912 Firefox/3.0"
-    br.addheaders = headers.items()
-
-    # Login
-    res = br.open(LOGIN_URL)
-    html = res.read()
-    print html
-    br.select_form(name="login_form")
-    br["logon"]    = user
-    br["password"] = pword
-    print "Logging in..."
-    br.submit()
-
-    # Send SMS
-    br.open(SMS_URL)
-    br.select_form(nr=1)
-    br["destinationNumber"] = number
-    br["messageBody"]       = txt
-
-    # Thanks for using shitty code Vodacom. We have to extract the submission
-    # url from the javascript code in the document.
-    page = br.response().read()
-    x = page.find('function validateFormInput()')
-    x = page.find('var actionURL', x)
-    actionURLStart = page.find("'", x) + 1
-    actionURLEnd   = page.find("'", actionURLStart)
-    actionURL      = page[actionURLStart:actionURLEnd]
-    br.form.action = 'https://www.vodacom.co.za' + actionURL
-
-    print "Sending message..."
-    br.submit()
-
-    response = br.response().read()
-    if 'Your SMS has been delivered successfully.' in response:
-        print "Message sent"
-    else:
-        print >>stderr, "Message sending failed. See /tmp/vodacom.html to see the response."
-        file('/tmp/vodacom.html', 'w').write(response)
-        exit(1)
-
-def fail(errcode, error, msg):
-    print errocode, error, msg
 
 def send_sms_direct(cellnr, mesg):
     try:
@@ -85,9 +29,6 @@ def send_sms_direct(cellnr, mesg):
         print "BIG ERROR - CANNOT SEND SMS!!!"
         fail(11, "Couldn't send SMS", cellnr+" "+mesg)
         return -1
-
-def send_sms_vodacom(cellnr, mesg):
-    send_sms_voda("XXXXXXXXXXX", "Y", cellnr, mesg)
 
 def send_sms(cellnr, mesg):
     if (len(mesg)>128): mesg=mesg[:128]
@@ -157,9 +98,8 @@ def main():
         s = f.readline()
     print "Message:", mes
     params = mes.split()
+    if (params[-1]=="www.vodacom.co.za"): params.pop()  # FIXME
     print "Message [split]:", params
-    print "params", params
-    if (params[-1]=="vodacom.co.za"): params.pop()  # FIXME
     cmd = params.pop(0).lower()
     # TODO: Proper dispatcher
     if (cmd=="post" or cmd=="p"):
@@ -171,8 +111,8 @@ def main():
     elif (cmd=="unfollow" or cmd =="u"):
         profiles_follow(cellnr, params.pop(0).lower())
     else:
-        sendsms(cellnr, "Unknown command")
-
+        #sendsms(cellnr, "Unknown command")
+        pass
 
 
 if __name__ == "__main__":

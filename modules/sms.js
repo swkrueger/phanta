@@ -15,8 +15,8 @@ sys.debug("loaded module " + __filename);
 
 sms.send = function(cellnr, message) {
     console.log("Sending SMS to "+cellnr+" | "+message);
-    var smssrv = http.createClient(80, '127.0.0.1');
-    var request = google.request('POST', '/cgi-bin/sendsms?cellnr='+cellnr);
+    var smssrv = http.createClient(80, '10.8.0.1');
+    var request = smssrv.request('POST', '/cgi-bin/sendsms?cellnr='+cellnr);
     request.end(message);
     request.on('response', function (response) {
     console.log('STATUS: ' + response.statusCode);

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # This script send a text sms at the command line by creating
 # a sms file in the outgoing queue.
 # I use it for testing.
@@ -20,6 +20,30 @@ if [ -z "$TEXT" ]; then
     read TEXT
 fi
 
+prefix1=${DEST:0:3}
+prefix2=${DEST:0:4}
+
+vodasend() {
+    echo "Sending through vodacom.co.za"
+    ~tiger/vodacom-wc.py $DEST "$TEXT"
+    exit 0;
+}
+
+case "$prefix1" in
+    076|082|071) 
+        vodasend
+        ;;
+    *) ;;
+esac
+case "$prefix2" in
+    2776|2782|2771)
+        vodasend
+        ;;
+    *) ;;
+esac
+
+echo "Sending through GSM modem"
+
 #FILE=`mktemp /backup/Server/Sharings/sms/outgoing/send_XXXXXX`
 FILE=`mktemp /tmp/send_XXXXXX`
 
@@ -28,5 +52,5 @@ echo "" >> $FILE
 echo -n "$TEXT" >> $FILE
 
 chmod 777 $FILE
-mv FILE /var/spool/sms/outgoing/
+#mv FILE /var/spool/sms/outgoing/
 
