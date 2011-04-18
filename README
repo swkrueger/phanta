@@ -1,0 +1,32 @@
+# Setting up the development environment
+
+IMPORTANT: Run these in order using your login account, NOT root!
+
+## base dependencies
+    sudo apt-get install git-core
+    sudo apt-get install build-essential
+  
+## environment 
+    mkdir ~/local
+    echo 'export PATH=$HOME/local/bin:$PATH' >> ~/.bashrc
+    . ~/.bashrc
+    mkdir ~/local/src
+
+## node.js
+    cd ~/local/src
+    git clone git://github.com/ry/node.git node.git
+    cd node.git
+    make
+    make install
+    cd ..
+
+## npm
+    git clone git://github.com/isaacs/npm.git npm.git
+    cd npm.git
+    make install
+    cd ~
+ 
+## node-redis
+    npm install redis
+
+
